@@ -63,7 +63,7 @@
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="emailmu@mail.com"
+            android:hint="emailmu@gmail.com"
             android:inputType="textEmailAddress"
             android:background="@drawable/input_bg"
             android:padding="12dp"
