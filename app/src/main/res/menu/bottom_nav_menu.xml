@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Tombol Home -->
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/logo"
+        android:title="Home"/>
+    <!-- Tombol Post -->
+    <item
+        android:id="@+id/nav_post"
+        android:icon="@drawable/logo"
+        android:title="Post"/>
+    <!-- Tombol Profile -->
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/logo"
+        android:title="Profile"/>
+</menu>
