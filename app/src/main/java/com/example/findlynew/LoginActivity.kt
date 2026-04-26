@@ -13,6 +13,7 @@ class LoginActivity : AppCompatActivity() {
 
         val txtDaftar = findViewById<TextView>(R.id.txtDaftar)
         val txtLupaPassword = findViewById<TextView>(R.id.txtLupaPassword)
+        val btnLogin = findViewById<android.widget.Button>(R.id.btnLogin)
 
         // Pindah ke halaman Sign Up
         txtDaftar.setOnClickListener {
@@ -22,6 +23,12 @@ class LoginActivity : AppCompatActivity() {
         // Lupa Password (sementara kosong)
         txtLupaPassword.setOnClickListener {
             // TODO: buat halaman forgot password
+        }
+
+        // Login sukses, masuk ke MainActivity
+        btnLogin.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 }

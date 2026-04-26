@@ -33,5 +33,17 @@ class MainActivity : AppCompatActivity() {
         
         val adapter = BarangAdapter(dummyList)
         rvBarang.adapter = adapter
+
+        // Setup Bottom Navbar
+        val navHome = findViewById<android.widget.ImageButton>(R.id.nav_home)
+        val navProfile = findViewById<android.widget.ImageButton>(R.id.nav_profile)
+
+        navHome.setOnClickListener {
+            // Already in Home
+        }
+
+        navProfile.setOnClickListener {
+            startActivity(android.content.Intent(this, ProfileActivity::class.java))
+        }
     }
 }

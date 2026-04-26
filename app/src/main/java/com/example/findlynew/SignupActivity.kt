@@ -17,11 +17,13 @@ class SignupActivity : AppCompatActivity() {
         val txtLogin = findViewById<TextView>(R.id.txtLogin)
 
         btnMasuk.setOnClickListener {
-            // TODO: masuk ke dashboard
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
         btnMahasiswa.setOnClickListener {
-            // TODO: masuk sebagai mahasiswa
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
         // pindah ke login
