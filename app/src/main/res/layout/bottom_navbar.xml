@@ -49,6 +49,6 @@
         android:contentDescription="Profile"
         android:padding="12dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/profile" />
+        android:src="@drawable/navbarprofile" />
 
 </LinearLayout>
