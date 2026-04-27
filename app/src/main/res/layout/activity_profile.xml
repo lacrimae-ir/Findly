@@ -46,6 +46,7 @@
 
             <!-- Nama -->
             <TextView
+                android:id="@+id/tvProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama Mahasiswa"
@@ -58,6 +59,7 @@
 
             <!-- Email -->
             <TextView
+                android:id="@+id/tvProfileEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="email@upnvj.ac.id"
@@ -193,6 +195,7 @@
 
             <!-- MENU 5 -->
             <LinearLayout
+                android:id="@+id/menuLogout"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="@drawable/menu_card_bg"

@@ -12,9 +12,15 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        val sessionManager = SessionManager(this)
+
         // Delay 2.5 detik
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, SignupActivity::class.java))
+            if (sessionManager.isLoggedIn()) {
+                startActivity(Intent(this, MainActivity::class.java))
+            } else {
+                startActivity(Intent(this, SignupActivity::class.java))
+            }
             finish()
         }, 2500)
     }
