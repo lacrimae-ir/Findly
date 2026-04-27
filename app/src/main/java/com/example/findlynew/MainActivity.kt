@@ -36,10 +36,15 @@ class MainActivity : AppCompatActivity() {
 
         // Setup Bottom Navbar
         val navHome = findViewById<android.widget.ImageButton>(R.id.nav_home)
+        val navPostAdd = findViewById<android.widget.ImageButton>(R.id.nav_post_add)
         val navProfile = findViewById<android.widget.ImageButton>(R.id.nav_profile)
 
         navHome.setOnClickListener {
             // Already in Home
+        }
+
+        navPostAdd.setOnClickListener {
+            startActivity(android.content.Intent(this, PostActivity::class.java))
         }
 
         navProfile.setOnClickListener {

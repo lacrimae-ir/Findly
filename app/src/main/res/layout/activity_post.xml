@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F6FA">
+
+    <!-- SCROLLABLE CONTENT -->
+    <ScrollView 
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Judul Post -->
+            <TextView
+                android:id="@+id/judul_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="POST A LOST OR FOUND STUFF HERE"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#444"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="4dp"
+                android:paddingBottom="20dp"/>
+
+            <!-- Nama Barang -->
+            <TextView
+                android:id="@+id/nama_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nama Barang"
+                android:textColor="#444"/>
+
+            <EditText
+                android:id="@+id/et_nama_barang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="ipon 21"
+                android:background="@drawable/input_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:textColorHint="#888888"
+                android:textColor="@color/black"/>
+
+            <!-- Lokasi -->
+            <TextView
+                android:id="@+id/lokasi_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lokasi"
+                android:textColor="#444"/>
+
+            <EditText
+                android:id="@+id/et_lokasi_barang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="di selasar..."
+                android:background="@drawable/input_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:textColorHint="#888888"
+                android:textColor="@color/black"/>
+
+            <!-- Kategori Barang -->
+            <TextView
+                android:id="@+id/kategori_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dicari/Ditemukan"
+                android:textColor="#444"/>
+            
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:endIconMode="dropdown_menu"
+                app:boxBackgroundColor="@android:color/transparent"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#5B7FFF"
+                app:hintEnabled="false">
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete_tipe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:padding="16dp"
+                    android:hint="Pilih Opsi"
+                    android:textColor="#5B7FFF"
+                    android:textColorHint="#888888"
+                    android:background="@null"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Kategori Asli -->
+            <TextView
+                android:id="@+id/tv_kategori_asli"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kategori"
+                android:textColor="#444"/>
+            
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:endIconMode="dropdown_menu"
+                app:boxBackgroundColor="@android:color/transparent"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="#5B7FFF"
+                app:hintEnabled="false">
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete_kategori"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:padding="16dp"
+                    android:hint="Pilih Kategori"
+                    android:textColor="#5B7FFF"
+                    android:textColorHint="#888888"
+                    android:background="@null"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <!-- Tanggal -->
+            <TextView
+                android:id="@+id/tanggal_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tanggal"
+                android:textColor="#444"/>
+
+            <EditText
+                android:id="@+id/et_tanggal_barang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="21/01/2026"
+                android:inputType="date"
+                android:background="@drawable/input_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:textColorHint="#888888"
+                android:textColor="@color/black"/>
+
+            <!-- Deskripsi Barang -->
+            <TextView
+                android:id="@+id/deskripsi_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Deskripsi"
+                android:textColor="#444"/>
+
+            <EditText
+                android:id="@+id/et_deskripsi_barang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="mulus, no lecet"
+                android:background="@drawable/input_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:textColorHint="#888888"
+                android:textColor="@color/black"/>
+            
+            <!-- Nomor Kontak -->
+            <TextView
+                android:id="@+id/kontak_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nomor kontak/WA"
+                android:textColor="#444"/>
+
+            <EditText
+                android:id="@+id/et_kontak_barang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="+628123456789"
+                android:inputType="phone"
+                android:digits="0123456789+"
+                android:background="@drawable/input_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="#888888"
+                android:textColor="@color/black"/>
+            
+            <!-- Upload Gambar Barang -->
+            <TextView
+                android:id="@+id/upload_gambar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gambar"
+                android:textColor="#444"/>
+
+            <ImageView
+                android:id="@+id/iv_upload_gambar"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_image_upload"
+                android:contentDescription="Upload Gambar"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"/>
+
+            <!-- Button -->
+            <Button
+                android:id="@+id/btn_submit_form"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="SUBMIT"
+                android:textAllCaps="true"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#5B7FFF"
+                android:layout_marginBottom="12dp"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- BOTTOM NAVBAR -->
+    <include layout="@layout/bottom_navbar" />
+
+</LinearLayout>

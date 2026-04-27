@@ -41,7 +41,13 @@ class BarangAdapter(private val listBarang: List<Barang>) : RecyclerView.Adapter
         
         // Handle click
         holder.btnSeeDetails.setOnClickListener {
-            // Action to view details
+            val context = holder.itemView.context
+            val intent = android.content.Intent(context, ItemDetailActivity::class.java)
+            intent.putExtra("EXTRA_NAMA", barang.nama)
+            intent.putExtra("EXTRA_STATUS", barang.status)
+            intent.putExtra("EXTRA_TANGGAL", barang.tanggal)
+            intent.putExtra("EXTRA_IMAGE", barang.imageResId)
+            context.startActivity(intent)
         }
     }
 
