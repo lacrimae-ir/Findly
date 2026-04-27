@@ -6,4 +6,15 @@
     </style>
 
     <style name="Theme.FindlyNew" parent="Base.Theme.FindlyNew" />
+
+    <style name="CustomPopupMenuTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="popupMenuStyle">@style/CustomPopupMenu</item>
+        <item name="android:textColorPrimary">#5B7FFF</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+    </style>
+
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_popup_rounded</item>
+        <item name="overlapAnchor">true</item>
+    </style>
 </resources>

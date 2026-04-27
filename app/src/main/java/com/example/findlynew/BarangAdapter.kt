@@ -28,7 +28,11 @@ class BarangAdapter(private var listBarang: List<Barang>) : RecyclerView.Adapter
         holder.tvTanggal.text = barang.tanggal
         
         holder.tvStatus.text = barang.status
-        holder.tvStatus.setTextColor(Color.parseColor("#F44336")) // Red
+        if (barang.status.equals("Kembali", ignoreCase = true)) {
+            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")) // Green
+        } else {
+            holder.tvStatus.setTextColor(Color.parseColor("#F44336")) // Red
+        }
 
         holder.ivBarang.setImageURI(android.net.Uri.parse(barang.gambar))
         holder.tvNamaBarang.text = barang.nama

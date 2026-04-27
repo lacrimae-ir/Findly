@@ -55,9 +55,13 @@
             android:textSize="14sp" />
 
         <ImageView
+            android:id="@+id/btn_filter"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_filter"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:tint="#888888" />
     </LinearLayout>
 

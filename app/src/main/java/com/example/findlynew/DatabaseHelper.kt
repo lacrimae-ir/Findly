@@ -261,4 +261,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
         return barang
     }
+
+    fun updatePostStatus(postId: Int, newStatus: String): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(COLUMN_POST_STATUS, newStatus)
+
+        val success = db.update(TABLE_POST, values, "$COLUMN_POST_ID=?", arrayOf(postId.toString()))
+        db.close()
+        return success > 0
+    }
 }
