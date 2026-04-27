@@ -20,19 +20,80 @@ class MainActivity : AppCompatActivity() {
         }
 
         val rvBarang = findViewById<RecyclerView>(R.id.rv_barang)
+        val tvEmptyState = findViewById<android.widget.TextView>(R.id.tv_empty_state)
+        val etSearch = findViewById<android.widget.EditText>(R.id.et_search)
         rvBarang.layoutManager = GridLayoutManager(this, 2)
         
-        val dummyList = listOf(
-            Barang("4/13/2026", "DITEMUKAN", "DOMPET BALENCIAGA", android.R.drawable.ic_menu_gallery),
-            Barang("4/13/2026", "DICARI", "IPONG 71", android.R.drawable.ic_menu_gallery),
-            Barang("4/13/2026", "KEMBALI", "Jam Mitochiba", android.R.drawable.ic_menu_gallery),
-            Barang("4/13/2026", "KEMBALI", "MacPrasasti", android.R.drawable.ic_menu_gallery),
-            Barang("4/13/2026", "KEMBALI", "Sepatu Bata", android.R.drawable.ic_menu_gallery),
-            Barang("4/13/2026", "DITEMUKAN", "Kacamata", android.R.drawable.ic_menu_gallery)
-        )
-        
-        val adapter = BarangAdapter(dummyList)
+        val dbHelper = DatabaseHelper(this)
+        val listPost = dbHelper.getAllPosts()
+        val adapter = BarangAdapter(listPost)
         rvBarang.adapter = adapter
+        
+        if (listPost.isEmpty()) {
+            tvEmptyState.visibility = android.view.View.VISIBLE
+            rvBarang.visibility = android.view.View.GONE
+        } else {
+            tvEmptyState.visibility = android.view.View.GONE
+            rvBarang.visibility = android.view.View.VISIBLE
+        }
+
+        // Logika Search Berdasarkan Keakuratan
+        etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString()?.trim()?.lowercase() ?: ""
+                
+                if (query.isEmpty()) {
+                    adapter.updateData(listPost)
+                    if (listPost.isEmpty()) {
+                        tvEmptyState.text = "Maaf, belum ada barang yang dilaporkan"
+                        tvEmptyState.visibility = android.view.View.VISIBLE
+                        rvBarang.visibility = android.view.View.GONE
+                    } else {
+                        tvEmptyState.visibility = android.view.View.GONE
+                        rvBarang.visibility = android.view.View.VISIBLE
+                    }
+                    return
+                }
+
+                // Kalkulasi Score Keakuratan
+                val scoredItems = listPost.mapNotNull { barang ->
+                    var score = 0
+                    val queryWords = query.split("\\s+".toRegex())
+                    
+                    for (word in queryWords) {
+                        if (word.isBlank()) continue
+                        
+                        val nameMatch = barang.nama.lowercase().contains(word)
+                        val descMatch = barang.deskripsi.lowercase().contains(word)
+                        
+                        if (nameMatch) score += 3
+                        if (descMatch) score += 1
+                    }
+                    
+                    // Bonus jika sama persis di nama
+                    if (barang.nama.lowercase() == query) {
+                        score += 5
+                    }
+                    
+                    if (score > 0) Pair(barang, score) else null
+                }
+                
+                // Urutkan dari score tertinggi
+                val sortedItems = scoredItems.sortedByDescending { it.second }.map { it.first }
+                adapter.updateData(sortedItems)
+
+                if (sortedItems.isEmpty()) {
+                    tvEmptyState.text = "Tidak menemukan barang yang sesuai"
+                    tvEmptyState.visibility = android.view.View.VISIBLE
+                    rvBarang.visibility = android.view.View.GONE
+                } else {
+                    tvEmptyState.visibility = android.view.View.GONE
+                    rvBarang.visibility = android.view.View.VISIBLE
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         // Setup Bottom Navbar
         val navHome = findViewById<android.widget.ImageButton>(R.id.nav_home)

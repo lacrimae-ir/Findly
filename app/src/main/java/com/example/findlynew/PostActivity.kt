@@ -51,7 +51,7 @@ class PostActivity : AppCompatActivity() {
         val btnSubmitForm = findViewById<Button>(R.id.btn_submit_form)
 
         // Logika Dropdown Tipe (Dicari/Ditemukan)
-        val opsiTipe = arrayOf("Kehilangan (Lost)", "Penemuan (Found)")
+        val opsiTipe = arrayOf("Dicari", "Penemuan")
         val adapterTipe = ArrayAdapter(this, R.layout.item_dropdown, opsiTipe)
         autoCompleteTipe.setAdapter(adapterTipe)
 
@@ -125,11 +125,32 @@ class PostActivity : AppCompatActivity() {
                     Toast.makeText(this, "Harap unggah foto", Toast.LENGTH_LONG).show()
                 }
                 else -> {
-                    Toast.makeText(this, "Laporan $tipe Berhasil Diposting!", Toast.LENGTH_LONG).show()
+                    try {
+                        // Simpan gambar ke internal storage
+                        val imagePath = saveImageToInternalStorage(imageUri!!)
+                        
+                        // Ambil user id dari session
+                        val sessionManager = SessionManager(this@PostActivity)
+                        val dbHelper = DatabaseHelper(this@PostActivity)
+                        val email = sessionManager.getUserEmail() ?: ""
+                        val userId = dbHelper.getUserIdByEmail(email)
 
-                    // Balik ke Home Habis Submit
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+                        // Insert ke database
+                        val isInserted = dbHelper.insertPost(
+                            userId, nama, lokasi, tipe, kategori, tanggal, deskripsi, kontak, imagePath
+                        )
+
+                        if (isInserted) {
+                            Toast.makeText(this@PostActivity, "Laporan $tipe Berhasil Diposting!", Toast.LENGTH_LONG).show()
+                            startActivity(Intent(this@PostActivity, MainActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this@PostActivity, "Gagal menyimpan laporan", Toast.LENGTH_LONG).show()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(this@PostActivity, "Terjadi kesalahan saat memproses data", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
@@ -150,5 +171,16 @@ class PostActivity : AppCompatActivity() {
         navProfile.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
         }
+    }
+
+    private fun saveImageToInternalStorage(uri: Uri): String {
+        val inputStream = contentResolver.openInputStream(uri)
+        val fileName = "post_image_${System.currentTimeMillis()}.jpg"
+        val file = java.io.File(filesDir, fileName)
+        val outputStream = java.io.FileOutputStream(file)
+        inputStream?.copyTo(outputStream)
+        inputStream?.close()
+        outputStream.close()
+        return file.absolutePath
     }
 }

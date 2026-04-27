@@ -1,8 +1,14 @@
 package com.example.findlynew
 
 data class Barang(
-    val tanggal: String,
-    val status: String,
+    val id: Int = 0,
+    val userId: Int = 0,
     val nama: String,
-    val imageResId: Int
+    val lokasi: String,
+    val status: String,
+    val kategori: String,
+    val tanggal: String,
+    val deskripsi: String,
+    val kontak: String,
+    val gambar: String
 )

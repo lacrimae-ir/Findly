@@ -17,7 +17,16 @@ class SplashActivity : AppCompatActivity() {
         // Delay 2.5 detik
         Handler(Looper.getMainLooper()).postDelayed({
             if (sessionManager.isLoggedIn()) {
-                startActivity(Intent(this, MainActivity::class.java))
+                val email = sessionManager.getUserEmail() ?: ""
+                val dbHelper = DatabaseHelper(this)
+                
+                // Verifikasi apakah user masih ada di database (berguna saat db di-reset)
+                if (dbHelper.checkEmailExists(email)) {
+                    startActivity(Intent(this, MainActivity::class.java))
+                } else {
+                    sessionManager.logout()
+                    startActivity(Intent(this, LoginActivity::class.java))
+                }
             } else {
                 startActivity(Intent(this, SignupActivity::class.java))
             }

@@ -23,28 +23,33 @@ class ItemDetailActivity : AppCompatActivity() {
         val tvUploader = findViewById<TextView>(R.id.tv_detail_uploader)
         val tvKontak = findViewById<TextView>(R.id.tv_detail_kontak)
 
-        // Get intent extras if any, or set mockup data for Balenciaga Wallet
-        val namaBarang = intent.getStringExtra("EXTRA_NAMA") ?: "DOMPET BALENCIAGA"
-        val statusBarang = intent.getStringExtra("EXTRA_STATUS") ?: "DITEMUKAN"
-        val tanggalBarang = intent.getStringExtra("EXTRA_TANGGAL") ?: "4/13/2026"
-        val imageResId = intent.getIntExtra("EXTRA_IMAGE", android.R.drawable.ic_menu_gallery)
-
-        // Mockup data for specific fields not in the dashboard
-        val deskripsiMock = "Dompet kulit warna hitam. Di dalamnya terdapat beberapa kartu identitas dan sedikit uang tunai. Ditemukan tergeletak di meja kantin."
-        val lokasiMock = "Kantin Utama"
-        val kategoriMock = "Barang Pribadi"
-        val uploaderMock = "Budi Santoso"
-        val kontakMock = "+6281234567890"
-
-        // Set data
-        ivFoto.setImageResource(imageResId)
-        tvNama.text = namaBarang
-        tvKategori.text = "Kategori: $kategoriMock"
-        tvTanggal.text = "$statusBarang pada: $tanggalBarang"
-        tvLokasi.text = "Lokasi: $lokasiMock"
-        tvDeskripsi.text = deskripsiMock
-        tvUploader.text = uploaderMock
-        tvKontak.text = kontakMock
+        // Get intent extras
+        val postId = intent.getIntExtra("EXTRA_POST_ID", -1)
+        
+        val dbHelper = DatabaseHelper(this)
+        val barang = dbHelper.getPostById(postId)
+        
+        if (barang != null) {
+            val uploaderName = dbHelper.getUserNameById(barang.userId)
+            
+            ivFoto.setImageURI(android.net.Uri.parse(barang.gambar))
+            tvNama.text = barang.nama
+            tvKategori.text = "Kategori: ${barang.kategori}"
+            tvTanggal.text = "${barang.status} pada: ${barang.tanggal}"
+            tvLokasi.text = "Lokasi: ${barang.lokasi}"
+            tvDeskripsi.text = barang.deskripsi
+            tvUploader.text = uploaderName
+            tvKontak.text = barang.kontak
+        } else {
+            // Handle error, data not found
+            tvNama.text = "Data Tidak Ditemukan"
+            tvKategori.text = "Kategori: -"
+            tvTanggal.text = "- pada: -"
+            tvLokasi.text = "Lokasi: -"
+            tvDeskripsi.text = "-"
+            tvUploader.text = "-"
+            tvKontak.text = "-"
+        }
 
         // Setup Bottom Navbar
         val navHome = findViewById<ImageButton>(R.id.nav_home)

@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class BarangAdapter(private val listBarang: List<Barang>) : RecyclerView.Adapter<BarangAdapter.BarangViewHolder>() {
+class BarangAdapter(private var listBarang: List<Barang>) : RecyclerView.Adapter<BarangAdapter.BarangViewHolder>() {
 
     class BarangViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTanggal: TextView = itemView.findViewById(R.id.tv_tanggal)
@@ -27,31 +27,27 @@ class BarangAdapter(private val listBarang: List<Barang>) : RecyclerView.Adapter
         val barang = listBarang[position]
         holder.tvTanggal.text = barang.tanggal
         
-        holder.tvStatus.text = "Status: ${barang.status}"
-        
-        // Color coding for status based on mockup (Red for DITEMUKAN/DICARI, Green for KEMBALI)
-        if (barang.status.equals("KEMBALI", ignoreCase = true)) {
-            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")) // Green
-        } else {
-            holder.tvStatus.setTextColor(Color.parseColor("#F44336")) // Red
-        }
+        holder.tvStatus.text = barang.status
+        holder.tvStatus.setTextColor(Color.parseColor("#F44336")) // Red
 
-        holder.ivBarang.setImageResource(barang.imageResId)
+        holder.ivBarang.setImageURI(android.net.Uri.parse(barang.gambar))
         holder.tvNamaBarang.text = barang.nama
         
         // Handle click
         holder.btnSeeDetails.setOnClickListener {
             val context = holder.itemView.context
             val intent = android.content.Intent(context, ItemDetailActivity::class.java)
-            intent.putExtra("EXTRA_NAMA", barang.nama)
-            intent.putExtra("EXTRA_STATUS", barang.status)
-            intent.putExtra("EXTRA_TANGGAL", barang.tanggal)
-            intent.putExtra("EXTRA_IMAGE", barang.imageResId)
+            intent.putExtra("EXTRA_POST_ID", barang.id)
             context.startActivity(intent)
         }
     }
 
     override fun getItemCount(): Int {
         return listBarang.size
+    }
+
+    fun updateData(newList: List<Barang>) {
+        listBarang = newList
+        notifyDataSetChanged()
     }
 }

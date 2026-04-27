@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3
         private const val DATABASE_NAME = "FindlyDB.db"
 
         // Tabel User
@@ -118,5 +118,147 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         db.close()
         return name
+    }
+
+    fun getUserIdByEmail(email: String): Int {
+        var id = -1
+        val db = this.readableDatabase
+        val columns = arrayOf(COLUMN_USER_ID)
+        val selection = "$COLUMN_USER_EMAIL = ?"
+        val selectionArgs = arrayOf(email)
+        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
+        
+        if (cursor.moveToFirst()) {
+            val idIndex = cursor.getColumnIndex(COLUMN_USER_ID)
+            if (idIndex != -1) {
+                id = cursor.getInt(idIndex)
+            }
+        }
+        cursor.close()
+        db.close()
+        return id
+    }
+
+    fun getUserNameById(userId: Int): String {
+        var name = "Unknown"
+        val db = this.readableDatabase
+        val columns = arrayOf(COLUMN_USER_NAME)
+        val selection = "$COLUMN_USER_ID = ?"
+        val selectionArgs = arrayOf(userId.toString())
+        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
+        
+        if (cursor.moveToFirst()) {
+            val nameIndex = cursor.getColumnIndex(COLUMN_USER_NAME)
+            if (nameIndex != -1) {
+                name = cursor.getString(nameIndex)
+            }
+        }
+        cursor.close()
+        db.close()
+        return name
+    }
+
+    fun insertPost(userId: Int, nama: String, lokasi: String, status: String, kategori: String, tanggal: String, deskripsi: String, kontak: String, gambar: String): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(COLUMN_POST_USER_ID, userId)
+        values.put(COLUMN_POST_NAMA_BARANG, nama)
+        values.put(COLUMN_POST_LOKASI, lokasi)
+        values.put(COLUMN_POST_STATUS, status)
+        values.put(COLUMN_POST_KATEGORI, kategori)
+        values.put(COLUMN_POST_TANGGAL, tanggal)
+        values.put(COLUMN_POST_DESKRIPSI, deskripsi)
+        values.put(COLUMN_POST_KONTAK, kontak)
+        values.put(COLUMN_POST_GAMBAR, gambar)
+
+        val success = db.insert(TABLE_POST, null, values)
+        db.close()
+        return (Integer.parseInt("$success") != -1)
+    }
+
+    fun getAllPosts(): List<Barang> {
+        val postList = ArrayList<Barang>()
+        val db = this.readableDatabase
+        val selectQuery = "SELECT * FROM $TABLE_POST ORDER BY $COLUMN_POST_ID DESC"
+        val cursor = db.rawQuery(selectQuery, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val idIndex = cursor.getColumnIndex(COLUMN_POST_ID)
+                val userIdIndex = cursor.getColumnIndex(COLUMN_POST_USER_ID)
+                val namaIndex = cursor.getColumnIndex(COLUMN_POST_NAMA_BARANG)
+                val lokasiIndex = cursor.getColumnIndex(COLUMN_POST_LOKASI)
+                val statusIndex = cursor.getColumnIndex(COLUMN_POST_STATUS)
+                val kategoriIndex = cursor.getColumnIndex(COLUMN_POST_KATEGORI)
+                val tanggalIndex = cursor.getColumnIndex(COLUMN_POST_TANGGAL)
+                val deskripsiIndex = cursor.getColumnIndex(COLUMN_POST_DESKRIPSI)
+                val kontakIndex = cursor.getColumnIndex(COLUMN_POST_KONTAK)
+                val gambarIndex = cursor.getColumnIndex(COLUMN_POST_GAMBAR)
+
+                if (idIndex != -1 && userIdIndex != -1 && namaIndex != -1 && lokasiIndex != -1 && 
+                    statusIndex != -1 && kategoriIndex != -1 && tanggalIndex != -1 && 
+                    deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1) {
+                    
+                    val barang = Barang(
+                        id = cursor.getInt(idIndex),
+                        userId = cursor.getInt(userIdIndex),
+                        nama = cursor.getString(namaIndex),
+                        lokasi = cursor.getString(lokasiIndex),
+                        status = cursor.getString(statusIndex),
+                        kategori = cursor.getString(kategoriIndex),
+                        tanggal = cursor.getString(tanggalIndex),
+                        deskripsi = cursor.getString(deskripsiIndex),
+                        kontak = cursor.getString(kontakIndex),
+                        gambar = cursor.getString(gambarIndex)
+                    )
+                    postList.add(barang)
+                }
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return postList
+    }
+
+    fun getPostById(postId: Int): Barang? {
+        var barang: Barang? = null
+        val db = this.readableDatabase
+        val selection = "$COLUMN_POST_ID = ?"
+        val selectionArgs = arrayOf(postId.toString())
+        val cursor = db.query(TABLE_POST, null, selection, selectionArgs, null, null, null)
+
+        if (cursor.moveToFirst()) {
+            val idIndex = cursor.getColumnIndex(COLUMN_POST_ID)
+            val userIdIndex = cursor.getColumnIndex(COLUMN_POST_USER_ID)
+            val namaIndex = cursor.getColumnIndex(COLUMN_POST_NAMA_BARANG)
+            val lokasiIndex = cursor.getColumnIndex(COLUMN_POST_LOKASI)
+            val statusIndex = cursor.getColumnIndex(COLUMN_POST_STATUS)
+            val kategoriIndex = cursor.getColumnIndex(COLUMN_POST_KATEGORI)
+            val tanggalIndex = cursor.getColumnIndex(COLUMN_POST_TANGGAL)
+            val deskripsiIndex = cursor.getColumnIndex(COLUMN_POST_DESKRIPSI)
+            val kontakIndex = cursor.getColumnIndex(COLUMN_POST_KONTAK)
+            val gambarIndex = cursor.getColumnIndex(COLUMN_POST_GAMBAR)
+
+            if (idIndex != -1 && userIdIndex != -1 && namaIndex != -1 && lokasiIndex != -1 && 
+                statusIndex != -1 && kategoriIndex != -1 && tanggalIndex != -1 && 
+                deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1) {
+                
+                barang = Barang(
+                    id = cursor.getInt(idIndex),
+                    userId = cursor.getInt(userIdIndex),
+                    nama = cursor.getString(namaIndex),
+                    lokasi = cursor.getString(lokasiIndex),
+                    status = cursor.getString(statusIndex),
+                    kategori = cursor.getString(kategoriIndex),
+                    tanggal = cursor.getString(tanggalIndex),
+                    deskripsi = cursor.getString(deskripsiIndex),
+                    kontak = cursor.getString(kontakIndex),
+                    gambar = cursor.getString(gambarIndex)
+                )
+            }
+        }
+        cursor.close()
+        db.close()
+        return barang
     }
 }
