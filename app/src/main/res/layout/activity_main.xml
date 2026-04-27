@@ -40,7 +40,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_search"
-            app:tint="#888888" />
+            app:tint="#666666" />
 
         <EditText
             android:id="@+id/et_search"
@@ -49,6 +49,8 @@
             android:layout_weight="1"
             android:background="@null"
             android:hint="Search"
+            android:textColorHint="#666666"
+            android:textColor="#000000"
             android:inputType="text"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
@@ -62,35 +64,43 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="#888888" />
+            app:tint="#666666" />
     </LinearLayout>
 
-    <!-- Items Grid -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_barang"
+    <!-- Items Area with SwipeRefresh -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_bg"
-        tools:listitem="@layout/item_barang" />
+        app:layout_constraintTop_toBottomOf="@id/header_bg">
 
-    <!-- Empty State Text -->
-    <TextView
-        android:id="@+id/tv_empty_state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Maaf, belum ada barang yang dilaporkan"
-        android:textSize="16sp"
-        android:textColor="#888888"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/header_bg"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_barang"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:padding="8dp"
+                android:paddingBottom="100dp"
+                tools:listitem="@layout/item_barang" />
+
+            <TextView
+                android:id="@+id/tv_empty_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Maaf, belum ada barang yang dilaporkan"
+                android:textColor="#888888"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- Bottom Navigation Bar -->
     <include

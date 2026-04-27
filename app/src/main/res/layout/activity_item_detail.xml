@@ -30,11 +30,12 @@
 
         <!-- DRAG HANDLE CONTAINER -->
         <LinearLayout
+            android:id="@+id/drag_handle_container"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:gravity="center"
             android:orientation="vertical">
-            
+
             <View
                 android:layout_width="40dp"
                 android:layout_height="4dp"
@@ -43,9 +44,12 @@
 
         <!-- SCROLLABLE CONTENT -->
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:paddingBottom="160dp"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -217,6 +221,18 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
+    </LinearLayout>
+
+    <!-- FLOATING ACTIONS: melayang di atas konten, background transparan -->
+    <LinearLayout
+        android:id="@+id/floating_actions_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="@android:color/transparent"
+        android:elevation="6dp">
+
         <!-- OWNER ACTIONS (Hidden by default) -->
         <LinearLayout
             android:id="@+id/ll_owner_actions"
@@ -224,7 +240,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:padding="16dp"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="8dp"
+            android:background="@android:color/transparent"
             android:visibility="gone">
 
             <Button
@@ -252,5 +270,15 @@
         <include layout="@layout/bottom_navbar" />
 
     </LinearLayout>
+
+    <!-- TRANSPARENT DRAG OVERLAY: sibling CoordinatorLayout, selalu duduk di atas handle bar -->
+    <View
+        android:id="@+id/drag_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@android:color/transparent"
+        android:elevation="8dp"
+        android:clickable="true"
+        android:focusable="true" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

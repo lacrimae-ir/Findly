@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var listPost: List<Barang>
     private lateinit var tvEmptyState: android.widget.TextView
     private lateinit var rvBarang: RecyclerView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         rvBarang = findViewById(R.id.rv_barang)
         tvEmptyState = findViewById(R.id.tv_empty_state)
+        swipeRefresh = findViewById(R.id.swipe_refresh)
         val etSearch = findViewById<android.widget.EditText>(R.id.et_search)
         val btnFilter = findViewById<android.widget.ImageView>(R.id.btn_filter)
         rvBarang.layoutManager = GridLayoutManager(this, 2)
@@ -37,6 +40,19 @@ class MainActivity : AppCompatActivity() {
         listPost = dbHelper.getAllPosts().filter { it.status != "HAPUS" }
         adapter = BarangAdapter(listPost)
         rvBarang.adapter = adapter
+
+        // Setup Pull-to-Refresh
+        swipeRefresh.setColorSchemeColors(
+            android.graphics.Color.parseColor("#4B8BF5"),
+            android.graphics.Color.parseColor("#5B9BFF"),
+            android.graphics.Color.parseColor("#3A7AE4")
+        )
+        swipeRefresh.setOnRefreshListener {
+            val db = DatabaseHelper(this)
+            listPost = db.getAllPosts().filter { it.status != "HAPUS" }
+            applyFilters()
+            swipeRefresh.isRefreshing = false
+        }
 
         // Setup PopupMenu for btnFilter
         btnFilter.setOnClickListener { view ->
@@ -89,10 +105,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh data
+        // Refresh data saat kembali ke halaman
         val dbHelper = DatabaseHelper(this)
         listPost = dbHelper.getAllPosts().filter { it.status != "HAPUS" }
         applyFilters()
+        swipeRefresh.isRefreshing = false
     }
 
     private fun applyFilters() {

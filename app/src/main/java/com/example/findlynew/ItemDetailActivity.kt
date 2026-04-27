@@ -16,6 +16,10 @@ import android.util.TypedValue
 import android.view.ViewTreeObserver
 import com.github.chrisbanes.photoview.PhotoView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import android.view.MotionEvent
+import android.view.VelocityTracker
+import android.animation.ValueAnimator
+import android.view.animation.DecelerateInterpolator
 class ItemDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,22 +36,101 @@ class ItemDetailActivity : AppCompatActivity() {
         val tvUploader = findViewById<TextView>(R.id.tv_detail_uploader)
         val tvKontak = findViewById<TextView>(R.id.tv_detail_kontak)
 
-        // Setup Bottom Sheet
+        // Setup Bottom Sheet — behavior hanya untuk posisi awal, TIDAK untuk drag
         val bottomSheet = findViewById<LinearLayout>(R.id.bottom_sheet)
         val coordinatorLayout = findViewById<CoordinatorLayout>(R.id.coordinator)
-        
+        val dragOverlay = findViewById<View>(R.id.drag_overlay)
+        val floatingWrapper = findViewById<LinearLayout>(R.id.floating_actions_wrapper)
+
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.isDraggable = false  // KITA yang handle drag, bukan behavior
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
+        // collapsedTranslationY = jarak sheet harus turun agar hanya peekHeight yang terlihat
+        var collapsedTranslationY = 0f
+
+        // Helper: update semua elemen sesuai posisi translationY saat ini
+        fun syncUI(translation: Float) {
+            bottomSheet.translationY = translation
+            dragOverlay.y = bottomSheet.y
+            val progress = if (collapsedTranslationY > 0f)
+                (translation / collapsedTranslationY).coerceIn(0f, 1f) else 0f
+            floatingWrapper.translationY = floatingWrapper.height * progress
+        }
+
+        // Animasi snap ke target translationY
+        fun snapTo(targetTranslation: Float) {
+            val startTranslation = bottomSheet.translationY
+            ValueAnimator.ofFloat(startTranslation, targetTranslation).apply {
+                duration = 280
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { syncUI(animatedValue as Float) }
+                start()
+            }
+        }
+
+        // VelocityTracker untuk deteksi flick
+        var velocityTracker: VelocityTracker? = null
+        var dragStartRawY = 0f
+        var dragStartTranslation = 0f
+
+        dragOverlay.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    velocityTracker?.recycle()
+                    velocityTracker = VelocityTracker.obtain()
+                    velocityTracker?.addMovement(event)
+                    dragStartRawY = event.rawY
+                    dragStartTranslation = bottomSheet.translationY
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    velocityTracker?.addMovement(event)
+                    val deltaY = event.rawY - dragStartRawY
+                    val newTranslation = (dragStartTranslation + deltaY)
+                        .coerceIn(0f, collapsedTranslationY)
+                    syncUI(newTranslation)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    velocityTracker?.addMovement(event)
+                    velocityTracker?.computeCurrentVelocity(1000)
+                    val vy = velocityTracker?.yVelocity ?: 0f
+                    val progress = if (collapsedTranslationY > 0f)
+                        bottomSheet.translationY / collapsedTranslationY else 0f
+
+                    // Tentukan arah snap berdasarkan velocity atau posisi
+                    val shouldCollapse = when {
+                        vy > 300f  -> true   // flick ke bawah
+                        vy < -300f -> false  // flick ke atas
+                        else -> progress >= 0.3f  // slow drag: threshold 30%
+                    }
+                    snapTo(if (shouldCollapse) collapsedTranslationY else 0f)
+
+                    velocityTracker?.recycle()
+                    velocityTracker = null
+                }
+            }
+            true  // konsumsi semua touch, jangan forward ke behavior
+        }
+
+        // Hitung tinggi sheet dan collapsedTranslationY setelah layout selesai
         coordinatorLayout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 coordinatorLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 val offsetPx = TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP, 250f, resources.displayMetrics
                 ).toInt()
+                val peekPx = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 30f, resources.displayMetrics
+                ).toInt()
                 val layoutParams = bottomSheet.layoutParams
                 layoutParams.height = coordinatorLayout.height - offsetPx
                 bottomSheet.layoutParams = layoutParams
+
+                bottomSheet.post {
+                    // Jarak yang harus ditempuh dari expanded ke peek position
+                    collapsedTranslationY = (bottomSheet.height - peekPx).toFloat()
+                    syncUI(0f)  // mulai di posisi expanded
+                }
             }
         })
 
