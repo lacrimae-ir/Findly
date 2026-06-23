@@ -30,7 +30,6 @@ class SignupActivity : AppCompatActivity() {
         val etConfirmPassword = findViewById<EditText>(R.id.etConfirmPassword)
         
         val btnMasuk = findViewById<Button>(R.id.btnMasuk)
-        val btnMahasiswa = findViewById<Button>(R.id.btnMahasiswa)
         val txtLogin = findViewById<TextView>(R.id.txtLogin)
 
         val textWatcher = object : TextWatcher {
@@ -96,12 +95,6 @@ class SignupActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Registrasi gagal", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        btnMahasiswa.setOnClickListener {
-            // Arahkan ke halaman Login
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
         }
 
         // pindah ke login

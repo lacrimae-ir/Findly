@@ -66,6 +66,7 @@
                     tools:text="DOMPET BALENCIAGA"
                     android:textSize="24sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/poppins_bold"
                     android:textColor="#333333"
                     android:layout_marginBottom="16dp"/>
                 
@@ -81,7 +82,8 @@
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/outline_button"
                     android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"/>
+                    android:paddingVertical="6dp"
+                    android:fontFamily="@font/poppins_regular"/>
 
                 <!-- TANGGAL -->
                 <LinearLayout
@@ -101,6 +103,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         tools:text="DITEMUKAN pada: 4/13/2026"
+                        android:fontFamily="@font/poppins_regular"
                         android:textColor="#555555"
                         android:textSize="14sp"/>
                 </LinearLayout>
@@ -123,6 +126,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         tools:text="Lokasi: Kantin Utama"
+                        android:fontFamily="@font/poppins_regular"
                         android:textColor="#555555"
                         android:textSize="14sp"/>
                 </LinearLayout>
@@ -135,6 +139,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#333333"
+                    android:fontFamily="@font/poppins_medium"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
                 
@@ -144,6 +149,7 @@
                     android:layout_height="wrap_content"
                     tools:text="Dompet kulit warna hitam. Di dalamnya terdapat beberapa kartu identitas dan sedikit uang tunai. Ditemukan tergeletak di meja kantin."
                     android:textColor="#666666"
+                    android:fontFamily="@font/poppins_regular"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp"
                     android:layout_marginBottom="24dp"/>
@@ -168,6 +174,7 @@
                             android:layout_height="wrap_content"
                             android:text="Informasi Uploader"
                             android:textSize="14sp"
+                            android:fontFamily="@font/poppins_bold"
                             android:textStyle="bold"
                             android:textColor="#333333"
                             android:layout_marginBottom="12dp"/>
@@ -190,6 +197,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="12dp"
                                 tools:text="Budi Santoso"
+                                android:fontFamily="@font/poppins_regular"
                                 android:textColor="#555555"
                                 android:textSize="14sp"/>
                         </LinearLayout>
@@ -211,6 +219,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="12dp"
                                 tools:text="+6281234567890"
+                                android:fontFamily="@font/poppins_regular"
                                 android:textColor="#5B7FFF"
                                 android:textSize="14sp"
                                 android:textStyle="bold"/>

@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:textColor="#333333"
             android:textSize="10sp"
+            android:fontFamily="@font/poppins_medium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="4/13/2026" />
@@ -32,6 +33,7 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:textStyle="bold"
+            android:fontFamily="@font/poppins_bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Status: DITEMUKAN"
@@ -62,7 +64,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_barang"
-            tools:text="DOMPET BALENCIAGA" />
+            tools:text="DOMPET BALENCIAGA"
+            android:fontFamily="@font/poppins_bold"/>
 
         <!-- See Details Button -->
         <TextView
@@ -76,6 +79,7 @@
             android:focusable="true"
             android:padding="8dp"
             android:text="See Details"
+            android:fontFamily="@font/poppins_regular"
             android:textColor="#555555"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"

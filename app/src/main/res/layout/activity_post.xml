@@ -26,6 +26,7 @@
                 android:text="POST A LOST OR FOUND STUFF HERE"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:fontFamily="@font/poppins_bold"
                 android:textColor="#444"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="4dp"
@@ -37,7 +38,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama Barang"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
 
             <EditText
                 android:id="@+id/et_nama_barang"
@@ -47,8 +49,9 @@
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
-                android:textColorHint="#888888"
-                android:textColor="@color/black"/>
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
 
             <!-- Lokasi -->
             <TextView
@@ -56,7 +59,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lokasi"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
 
             <EditText
                 android:id="@+id/et_lokasi_barang"
@@ -66,8 +70,9 @@
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
-                android:textColorHint="#888888"
-                android:textColor="@color/black"/>
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
 
             <!-- Kategori Barang -->
             <TextView
@@ -75,13 +80,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Dicari/Ditemukan"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
             
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:background="@drawable/input_bg"
                 app:endIconMode="dropdown_menu"
                 app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -98,8 +105,9 @@
                     android:inputType="none"
                     android:padding="16dp"
                     android:hint="Pilih Opsi"
-                    android:textColor="#5B7FFF"
-                    android:textColorHint="#888888"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999"
+                    android:fontFamily="@font/poppins_regular"
                     android:background="@null"/>
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -109,7 +117,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kategori"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
             
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -134,7 +143,7 @@
                     android:hint="Pilih Kategori"
                     android:textColor="#5B7FFF"
                     android:textColorHint="#888888"
-                    android:background="@null"/>
+                    android:background="@drawable/input_bg"/>
             </com.google.android.material.textfield.TextInputLayout>
             
             <!-- Tanggal -->
@@ -143,7 +152,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tanggal"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
 
             <EditText
                 android:id="@+id/et_tanggal_barang"
@@ -154,8 +164,9 @@
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
-                android:textColorHint="#888888"
-                android:textColor="@color/black"/>
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
 
             <!-- Deskripsi Barang -->
             <TextView
@@ -163,7 +174,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Deskripsi"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
 
             <EditText
                 android:id="@+id/et_deskripsi_barang"
@@ -173,8 +185,9 @@
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
-                android:textColorHint="#888888"
-                android:textColor="@color/black"/>
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
             
             <!-- Nomor Kontak -->
             <TextView
@@ -182,7 +195,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nomor kontak/WA"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
 
             <EditText
                 android:id="@+id/et_kontak_barang"
@@ -194,8 +208,9 @@
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="20dp"
-                android:textColorHint="#888888"
-                android:textColor="@color/black"/>
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
             
             <!-- Upload Gambar Barang -->
             <TextView
@@ -203,7 +218,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gambar"
-                android:textColor="#444"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"/>
 
             <ImageView
                 android:id="@+id/iv_upload_gambar"
@@ -212,6 +228,7 @@
                 android:scaleType="centerCrop"
                 android:background="@drawable/bg_image_upload"
                 android:contentDescription="Upload Gambar"
+                android:fontFamily="@font/poppins_medium"
                 android:layout_marginBottom="16dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -225,7 +242,8 @@
                 android:text="SUBMIT"
                 android:textAllCaps="true"
                 android:textColor="#FFFFFF"
-                android:backgroundTint="#5B7FFF"
+                android:fontFamily="@font/poppins_medium"
+                android:backgroundTint="#236CDF"
                 android:layout_marginBottom="12dp"/>
         </LinearLayout>
     </ScrollView>
