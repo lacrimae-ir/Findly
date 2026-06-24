@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:gravity="center_horizontal"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BARANG APA YANG\nANDA CARI?"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:gravity="center" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnElektronik"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="ELEKTRONIK"
+        android:textColor="#5B7FFF"
+        android:background="@drawable/bg_survey_button_unselected"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnUang"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="UANG"
+        android:textColor="#5B7FFF"
+        android:background="@drawable/bg_survey_button_unselected"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnAlatTulis"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="ALAT TULIS / BUKU"
+        android:textColor="#5B7FFF"
+        android:background="@drawable/bg_survey_button_unselected"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnPakaian"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="PAKAIAN"
+        android:textColor="#5B7FFF"
+        android:background="@drawable/bg_survey_button_unselected"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnAksesoris"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="AKSESORIS"
+        android:textColor="#5B7FFF"
+        android:background="@drawable/bg_survey_button_unselected"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnOthers"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="OTHERS"
+        android:textColor="#5B7FFF"
+        android:background="@drawable/bg_survey_button_unselected"
+        android:layout_marginBottom="32dp"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnLanjut"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="LANJUT"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/bg_survey_button_selected"
+        android:layout_marginTop="16dp"
+        android:textStyle="bold" />
+
+</LinearLayout>
