@@ -18,11 +18,22 @@ class ProfileActivity : AppCompatActivity() {
 
         val tvProfileName = findViewById<TextView>(R.id.tvProfileName)
         val tvProfileEmail = findViewById<TextView>(R.id.tvProfileEmail)
+        val menuSettings = findViewById<LinearLayout>(R.id.menuSettings)
+        val menuPreferencesProfile = findViewById<LinearLayout>(R.id.menuPreferencesProfile)
         val menuLogout = findViewById<LinearLayout>(R.id.menuLogout)
 
         // Set Data
         tvProfileName.text = sessionManager.getUserName()
         tvProfileEmail.text = sessionManager.getUserEmail()
+
+        // Menu Actions
+        menuSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
+        menuPreferencesProfile.setOnClickListener {
+            startActivity(Intent(this, SurveyPreferencesActivity::class.java))
+        }
 
         // Logout
         menuLogout.setOnClickListener {

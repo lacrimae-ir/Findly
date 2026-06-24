@@ -101,6 +101,29 @@ class MainActivity : AppCompatActivity() {
         navProfile.setOnClickListener {
             startActivity(android.content.Intent(this, ProfileActivity::class.java))
         }
+
+        val btnNotification = findViewById<android.widget.ImageView>(R.id.btn_notification)
+        btnNotification.setOnClickListener {
+            startActivity(android.content.Intent(this, NotificationActivity::class.java))
+        }
+
+        // Setup Notification Channel
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = android.app.NotificationChannel(
+                "FINDLY_NOTIFICATIONS",
+                "Findly Notifications",
+                android.app.NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(android.app.NotificationManager::class.java)
+            manager?.createNotificationChannel(channel)
+        }
+
+        // Request Notification Permission for Android 13+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
     }
 
     override fun onResume() {

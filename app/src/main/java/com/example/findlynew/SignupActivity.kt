@@ -90,7 +90,7 @@ class SignupActivity : AppCompatActivity() {
                 // Auto login after registration
                 sessionManager.saveLoginSession(name, email)
                 Toast.makeText(this, "Registrasi berhasil, langsung masuk", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, SurveyPreferencesActivity::class.java))
                 finish()
             } else {
                 Toast.makeText(this, "Registrasi gagal", Toast.LENGTH_SHORT).show()

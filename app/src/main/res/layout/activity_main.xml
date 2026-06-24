@@ -19,53 +19,71 @@
             android:layout_height="100dp"
             android:background="#4B8BF5">
 
-            <!-- SEARCH BAR -->
             <LinearLayout
-                android:id="@+id/search_bar"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
-                android:background="@drawable/search_bg"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="#666666" />
-
-                <EditText
-                    android:id="@+id/et_search"
+                <!-- SEARCH BAR -->
+                <LinearLayout
+                    android:id="@+id/search_bar"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@null"
-                    android:hint="Search"
-                    android:inputType="text"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:textColor="#000000"
-                    android:textColorHint="#666666"
-                    android:fontFamily="@font/poppins_regular"
-                    android:textSize="14sp" />
+                    android:background="@drawable/search_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="#666666" />
+
+                    <EditText
+                        android:id="@+id/et_search"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Search"
+                        android:inputType="text"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#666666"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/btn_filter"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:src="@drawable/ic_filter"
+                        app:tint="#666666" />
+                </LinearLayout>
+
+                <!-- BELL ICON -->
                 <ImageView
-                    android:id="@+id/btn_filter"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:id="@+id/btn_notification"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="16dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:src="@drawable/ic_filter"
-                    app:tint="#666666" />
-
+                    android:src="@drawable/notification"
+                    app:tint="@android:color/white" />
             </LinearLayout>
-
         </FrameLayout>
 
         <!-- AREA LIST BARANG -->

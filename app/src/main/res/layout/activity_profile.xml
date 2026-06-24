@@ -69,15 +69,18 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="24dp" />
 
-            <!-- MENU 1 -->
+            <!-- MENU 1: SETTINGS -->
             <LinearLayout
+                android:id="@+id/menuSettings"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="@drawable/menu_card_bg"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="16dp"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="22dp"
@@ -100,7 +103,42 @@
                     android:textSize="18sp" />
             </LinearLayout>
 
-            <!-- MENU 2 -->
+            <!-- MENU 2: PREFERENCES -->
+            <LinearLayout
+                android:id="@+id/menuPreferencesProfile"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/menu_card_bg"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <!-- You can replace ic_filter or notification icon here. Using settings for now, or just an icon. Let's use person or edit icon. Let's use ic_filter. -->
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_filter" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Preferences"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:layout_marginStart="14dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=">"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <!-- MENU 3: LOGOUT -->
             <LinearLayout
                 android:id="@+id/menuLogout"
                 android:layout_width="match_parent"

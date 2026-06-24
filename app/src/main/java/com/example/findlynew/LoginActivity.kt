@@ -82,7 +82,11 @@ class LoginActivity : AppCompatActivity() {
                 sessionManager.saveLoginSession(name, email)
                 
                 Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainActivity::class.java))
+                if (sessionManager.hasCompletedSurvey(email)) {
+                    startActivity(Intent(this, MainActivity::class.java))
+                } else {
+                    startActivity(Intent(this, SurveyPreferencesActivity::class.java))
+                }
                 finish()
             } else {
                 Toast.makeText(this, "Email atau Password salah", Toast.LENGTH_SHORT).show()

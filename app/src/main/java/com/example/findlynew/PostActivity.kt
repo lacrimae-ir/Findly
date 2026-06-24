@@ -141,6 +141,13 @@ class PostActivity : AppCompatActivity() {
                         )
 
                         if (isInserted) {
+                            // Check Preferences and Trigger Notification
+                            val preferences = sessionManager.getUserPreferences(email)
+                            val isMatch = preferences.any { it.equals(kategori, ignoreCase = true) }
+                            if (isMatch) {
+                                showNotification(nama)
+                            }
+
                             Toast.makeText(this@PostActivity, "Laporan $tipe Berhasil Diposting!", Toast.LENGTH_LONG).show()
                             startActivity(Intent(this@PostActivity, MainActivity::class.java))
                             finish()
@@ -182,5 +189,29 @@ class PostActivity : AppCompatActivity() {
         inputStream?.close()
         outputStream.close()
         return file.absolutePath
+    }
+
+    private fun showNotification(namaBarang: String) {
+        val intent = Intent(this, NotificationActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent = android.app.PendingIntent.getActivity(this, 0, intent, android.app.PendingIntent.FLAG_IMMUTABLE)
+
+        val builder = androidx.core.app.NotificationCompat.Builder(this, "FINDLY_NOTIFICATIONS")
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setContentTitle("Apakah anda mencari barang ini?")
+            .setContentText(namaBarang)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        val notificationManager = androidx.core.app.NotificationManagerCompat.from(this)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+            }
+        } else {
+            notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+        }
     }
 }
