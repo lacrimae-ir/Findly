@@ -68,6 +68,10 @@
             android:name=".NotificationActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".SeeAllActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

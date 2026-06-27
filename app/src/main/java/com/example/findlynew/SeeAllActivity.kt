@@ -1,0 +1,223 @@
+package com.example.findlynew
+
+import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import android.view.inputmethod.InputMethodManager
+
+class SeeAllActivity : AppCompatActivity() {
+
+    private var currentQuery: String = ""
+    private var currentCategory: String = "Semua Kategori"
+    private lateinit var adapter: BarangAdapter
+    private lateinit var listPost: List<Barang>
+    private lateinit var tvEmptyState: android.widget.TextView
+    private lateinit var rvBarang: RecyclerView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_see_all)
+
+        val selectedCategory = intent.getStringExtra("CATEGORY")
+
+        val openSearch = intent.getBooleanExtra("OPEN_SEARCH", false)
+        val openFilter = intent.getBooleanExtra("OPEN_FILTER", false)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        rvBarang = findViewById(R.id.rv_barang)
+        tvEmptyState = findViewById(R.id.tv_empty_state)
+        swipeRefresh = findViewById(R.id.swipe_refresh)
+        val etSearch = findViewById<android.widget.EditText>(R.id.et_search)
+        val btnFilter = findViewById<android.widget.ImageView>(R.id.btn_filter)
+
+        if (openSearch) {
+
+            etSearch.requestFocus()
+
+            val imm = getSystemService(INPUT_METHOD_SERVICE)
+                    as InputMethodManager
+
+            imm.showSoftInput(
+                etSearch,
+                InputMethodManager.SHOW_IMPLICIT
+            )
+
+        }
+
+        rvBarang.layoutManager = GridLayoutManager(this, 2)
+
+        val dbHelper = DatabaseHelper(this)
+        listPost = dbHelper.getAllPosts().filter { it.status != "HAPUS" }
+
+        selectedCategory?.let { category ->
+            currentCategory = category
+        }
+
+        adapter = BarangAdapter(listPost)
+        rvBarang.adapter = adapter
+
+        // Setup Pull-to-Refresh
+        swipeRefresh.setColorSchemeColors(
+            android.graphics.Color.parseColor("#4B8BF5"),
+            android.graphics.Color.parseColor("#5B9BFF"),
+            android.graphics.Color.parseColor("#3A7AE4")
+        )
+        swipeRefresh.setOnRefreshListener {
+            val db = DatabaseHelper(this)
+            listPost = db.getAllPosts().filter { it.status != "HAPUS" }
+            applyFilters()
+            swipeRefresh.isRefreshing = false
+        }
+
+        // Setup PopupMenu for btnFilter
+        btnFilter.setOnClickListener { view ->
+            val wrapper = android.view.ContextThemeWrapper(this, R.style.CustomPopupMenuTheme)
+            val popup = androidx.appcompat.widget.PopupMenu(wrapper, view)
+            popup.menu.add("Semua Kategori")
+            popup.menu.add("Elektronik")
+            popup.menu.add("Uang")
+            popup.menu.add("Alat Tulis/Buku")
+            popup.menu.add("Barang Pribadi")
+
+            popup.setOnMenuItemClickListener { item ->
+                currentCategory = item.title.toString()
+                applyFilters()
+                true
+            }
+            popup.show()
+        }
+
+        // Logika Search Berdasarkan Keakuratan
+        etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                currentQuery = s?.toString()?.trim()?.lowercase() ?: ""
+                applyFilters()
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
+        // Initial Filter Apply
+        applyFilters()
+
+        // Setup Bottom Navbar
+        val navHome = findViewById<android.widget.ImageButton>(R.id.nav_home)
+        val navPostAdd = findViewById<android.widget.ImageButton>(R.id.nav_post_add)
+        val navProfile = findViewById<android.widget.ImageButton>(R.id.nav_profile)
+
+        navHome.setOnClickListener {
+
+            val intent = android.content.Intent(this, MainActivity::class.java)
+
+            intent.flags =
+                android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+            startActivity(intent)
+            finish()
+        }
+
+        navPostAdd.setOnClickListener {
+            startActivity(android.content.Intent(this, PostActivity::class.java))
+        }
+
+        navProfile.setOnClickListener {
+            startActivity(android.content.Intent(this, ProfileActivity::class.java))
+        }
+
+        val btnNotification = findViewById<android.widget.ImageView>(R.id.btn_notification)
+        btnNotification.setOnClickListener {
+            startActivity(android.content.Intent(this, NotificationActivity::class.java))
+        }
+
+        // Setup Notification Channel
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = android.app.NotificationChannel(
+                "FINDLY_NOTIFICATIONS",
+                "Findly Notifications",
+                android.app.NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(android.app.NotificationManager::class.java)
+            manager?.createNotificationChannel(channel)
+        }
+
+        // Request Notification Permission for Android 13+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh data saat kembali ke halaman
+        val dbHelper = DatabaseHelper(this)
+        listPost = dbHelper.getAllPosts().filter { it.status != "HAPUS" }
+        applyFilters()
+        swipeRefresh.isRefreshing = false
+    }
+
+    private fun applyFilters() {
+        var filteredList = listPost
+
+        // Filter kategori
+        if (currentCategory != "Semua Kategori") {
+            filteredList = filteredList.filter { it.kategori.equals(currentCategory, ignoreCase = true) }
+        }
+
+        // Filter & Score pencarian
+        if (currentQuery.isNotEmpty()) {
+            val scoredItems = filteredList.mapNotNull { barang ->
+                var score = 0
+                val queryWords = currentQuery.split("\\s+".toRegex())
+
+                for (word in queryWords) {
+                    if (word.isBlank()) continue
+
+                    val nameMatch = barang.nama.lowercase().contains(word)
+                    val descMatch = barang.deskripsi.lowercase().contains(word)
+
+                    if (nameMatch) score += 3
+                    if (descMatch) score += 1
+                }
+
+                if (barang.nama.lowercase() == currentQuery) {
+                    score += 5
+                }
+
+                if (score > 0) Pair(barang, score) else null
+            }
+
+            filteredList = scoredItems.sortedByDescending { it.second }.map { it.first }
+        }
+
+        adapter.updateData(filteredList)
+
+        if (filteredList.isEmpty()) {
+            tvEmptyState.visibility = android.view.View.VISIBLE
+            rvBarang.visibility = android.view.View.GONE
+
+            if (currentQuery.isNotEmpty() || currentCategory != "Semua Kategori") {
+                tvEmptyState.text = "Tidak menemukan barang yang sesuai"
+            } else {
+                tvEmptyState.text = "Maaf, belum ada barang yang dilaporkan"
+            }
+        } else {
+            tvEmptyState.visibility = android.view.View.GONE
+            rvBarang.visibility = android.view.View.VISIBLE
+        }
+    }
+}

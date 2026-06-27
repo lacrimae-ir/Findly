@@ -50,13 +50,13 @@ class PostActivity : AppCompatActivity() {
         ivUpload = findViewById<ImageView>(R.id.iv_upload_gambar)
         val btnSubmitForm = findViewById<Button>(R.id.btn_submit_form)
 
-        // Logika Dropdown Tipe (Dicari/Ditemukan)
-        val opsiTipe = arrayOf("Dicari", "Penemuan")
+        // Logika Dropdown Tipe (Hilang/Ditemukan)
+        val opsiTipe = arrayOf("Hilang", "Ditemukan")
         val adapterTipe = ArrayAdapter(this, R.layout.item_dropdown, opsiTipe)
         autoCompleteTipe.setAdapter(adapterTipe)
 
         // Logika Dropdown Kategori Barang
-        val opsiKategori = arrayOf("Elektronik", "Uang", "Alat Tulis/Buku", "Barang Pribadi")
+        val opsiKategori = arrayOf("Elektronik", "Uang", "Alat Tulis/Buku", "Aksesoris", "Pakaian", "Lainnya")
         val adapterKategori = ArrayAdapter(this, R.layout.item_dropdown, opsiKategori)
         autoCompleteKategori.setAdapter(adapterKategori)
 

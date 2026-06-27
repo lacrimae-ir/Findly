@@ -23,11 +23,11 @@
                 android:id="@+id/judul_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="POST A LOST OR FOUND STUFF HERE"
-                android:textSize="20sp"
+                android:text="POST LOST OR FOUND STUFF"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_bold"
-                android:textColor="#444"
+                android:textColor="#212121"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="4dp"
                 android:paddingBottom="20dp"/>
@@ -38,6 +38,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama Barang"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
 
@@ -45,7 +47,7 @@
                 android:id="@+id/et_nama_barang"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ipon 21"
+                android:hint="Handphone"
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
@@ -59,6 +61,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lokasi"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
 
@@ -66,7 +70,7 @@
                 android:id="@+id/et_lokasi_barang"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="di selasar..."
+                android:hint="Selasar FIK"
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
@@ -79,7 +83,9 @@
                 android:id="@+id/kategori_barang"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dicari/Ditemukan"
+                android:text="Hilang/Ditemukan"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
             
@@ -117,6 +123,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kategori"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
             
@@ -152,6 +160,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tanggal"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
 
@@ -174,6 +184,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Deskripsi"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
 
@@ -181,7 +193,7 @@
                 android:id="@+id/et_deskripsi_barang"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="mulus, no lecet"
+                android:hint="Warna hitam"
                 android:background="@drawable/input_bg"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
@@ -195,6 +207,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nomor kontak/WA"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
 
@@ -202,7 +216,7 @@
                 android:id="@+id/et_kontak_barang"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="+628123456789"
+                android:hint="08123456789"
                 android:inputType="phone"
                 android:digits="0123456789+"
                 android:background="@drawable/input_bg"
@@ -218,6 +232,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gambar"
+                android:textColor="#212121"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_medium"/>
 
