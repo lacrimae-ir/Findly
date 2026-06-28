@@ -60,16 +60,6 @@
                         android:textColorHint="#666666"
                         android:fontFamily="@font/poppins_regular"
                         android:textSize="14sp" />
-
-                    <ImageView
-                        android:id="@+id/btn_filter"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:src="@drawable/ic_filter"
-                        app:tint="#666666" />
                 </LinearLayout>
 
                 <!-- BELL ICON -->

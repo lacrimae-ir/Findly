@@ -26,12 +26,13 @@ class BarangAdapter(private var listBarang: List<Barang>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: BarangViewHolder, position: Int) {
         val barang = listBarang[position]
         holder.tvTanggal.text = barang.tanggal
-        
+
         holder.tvStatus.text = barang.status
-        if (barang.status.equals("Kembali", ignoreCase = true)) {
-            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")) // Green
+
+        if (barang.selesai == 1) {
+            holder.tvStatus.setTextColor(Color.parseColor("#9E9E9E"))
         } else {
-            holder.tvStatus.setTextColor(Color.parseColor("#F44336")) // Red
+            holder.tvStatus.setTextColor(Color.parseColor("#E53935"))
         }
 
         holder.ivBarang.setImageURI(android.net.Uri.parse(barang.gambar))

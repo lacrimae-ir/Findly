@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_VERSION = 4
+        private const val DATABASE_VERSION = 5
         private const val DATABASE_NAME = "FindlyDB.db"
 
         // Tabel User
@@ -30,6 +30,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val COLUMN_POST_DESKRIPSI = "deskripsi"
         private const val COLUMN_POST_KONTAK = "kontak"
         private const val COLUMN_POST_GAMBAR = "gambar"
+        private const val COLUMN_POST_SELESAI = "selesai"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -51,6 +52,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 + COLUMN_POST_DESKRIPSI + " TEXT,"
                 + COLUMN_POST_KONTAK + " TEXT,"
                 + COLUMN_POST_GAMBAR + " TEXT,"
+                + COLUMN_POST_SELESAI + " INTEGER DEFAULT 0,"
                 + "FOREIGN KEY(" + COLUMN_POST_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_USER_ID + "))")
         db.execSQL(createTablePost)
     }
@@ -170,6 +172,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         values.put(COLUMN_POST_DESKRIPSI, deskripsi)
         values.put(COLUMN_POST_KONTAK, kontak)
         values.put(COLUMN_POST_GAMBAR, gambar)
+        values.put(COLUMN_POST_SELESAI, 0)
 
         val success = db.insert(TABLE_POST, null, values)
         db.close()
@@ -194,10 +197,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val deskripsiIndex = cursor.getColumnIndex(COLUMN_POST_DESKRIPSI)
                 val kontakIndex = cursor.getColumnIndex(COLUMN_POST_KONTAK)
                 val gambarIndex = cursor.getColumnIndex(COLUMN_POST_GAMBAR)
+                val selesaiIndex = cursor.getColumnIndex(COLUMN_POST_SELESAI)
 
                 if (idIndex != -1 && userIdIndex != -1 && namaIndex != -1 && lokasiIndex != -1 && 
                     statusIndex != -1 && kategoriIndex != -1 && tanggalIndex != -1 && 
-                    deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1) {
+                    deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1 && selesaiIndex != -1) {
                     
                     val barang = Barang(
                         id = cursor.getInt(idIndex),
@@ -209,7 +213,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         tanggal = cursor.getString(tanggalIndex),
                         deskripsi = cursor.getString(deskripsiIndex),
                         kontak = cursor.getString(kontakIndex),
-                        gambar = cursor.getString(gambarIndex)
+                        gambar = cursor.getString(gambarIndex),
+                        selesai = cursor.getInt(selesaiIndex)
                     )
                     postList.add(barang)
                 }
@@ -238,10 +243,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             val deskripsiIndex = cursor.getColumnIndex(COLUMN_POST_DESKRIPSI)
             val kontakIndex = cursor.getColumnIndex(COLUMN_POST_KONTAK)
             val gambarIndex = cursor.getColumnIndex(COLUMN_POST_GAMBAR)
+            val selesaiIndex = cursor.getColumnIndex(COLUMN_POST_SELESAI)
 
             if (idIndex != -1 && userIdIndex != -1 && namaIndex != -1 && lokasiIndex != -1 && 
                 statusIndex != -1 && kategoriIndex != -1 && tanggalIndex != -1 && 
-                deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1) {
+                deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1 && selesaiIndex != -1) {
                 
                 barang = Barang(
                     id = cursor.getInt(idIndex),
@@ -253,7 +259,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     tanggal = cursor.getString(tanggalIndex),
                     deskripsi = cursor.getString(deskripsiIndex),
                     kontak = cursor.getString(kontakIndex),
-                    gambar = cursor.getString(gambarIndex)
+                    gambar = cursor.getString(gambarIndex),
+                    selesai = cursor.getInt(selesaiIndex)
                 )
             }
         }
@@ -270,5 +277,23 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val success = db.update(TABLE_POST, values, "$COLUMN_POST_ID=?", arrayOf(postId.toString()))
         db.close()
         return success > 0
+    }
+
+    fun updatePostSelesai(postId: Int, selesai: Int): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        values.put(COLUMN_POST_SELESAI, selesai)
+
+        val result = db.update(
+            TABLE_POST,
+            values,
+            "$COLUMN_POST_ID=?",
+            arrayOf(postId.toString())
+        )
+
+        db.close()
+
+        return result > 0
     }
 }

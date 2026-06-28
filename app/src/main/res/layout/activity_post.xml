@@ -78,7 +78,7 @@
                 android:textColorHint="#999999"
                 android:fontFamily="@font/poppins_regular"/>
 
-            <!-- Kategori Barang -->
+            <!-- Hilang/Ditemukan -->
             <TextView
                 android:id="@+id/kategori_barang"
                 android:layout_width="wrap_content"
@@ -94,7 +94,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:background="@drawable/input_bg"
                 app:endIconMode="dropdown_menu"
                 app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -114,10 +113,10 @@
                     android:textColor="#000000"
                     android:textColorHint="#999999"
                     android:fontFamily="@font/poppins_regular"
-                    android:background="@null"/>
+                    android:background="@drawable/input_bg"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kategori Asli -->
+            <!-- Kategori Barang -->
             <TextView
                 android:id="@+id/tv_kategori_asli"
                 android:layout_width="wrap_content"

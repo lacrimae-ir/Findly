@@ -28,7 +28,6 @@ class SeeAllActivity : AppCompatActivity() {
         val selectedCategory = intent.getStringExtra("CATEGORY")
 
         val openSearch = intent.getBooleanExtra("OPEN_SEARCH", false)
-        val openFilter = intent.getBooleanExtra("OPEN_FILTER", false)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -40,7 +39,6 @@ class SeeAllActivity : AppCompatActivity() {
         tvEmptyState = findViewById(R.id.tv_empty_state)
         swipeRefresh = findViewById(R.id.swipe_refresh)
         val etSearch = findViewById<android.widget.EditText>(R.id.et_search)
-        val btnFilter = findViewById<android.widget.ImageView>(R.id.btn_filter)
 
         if (openSearch) {
 
@@ -79,24 +77,6 @@ class SeeAllActivity : AppCompatActivity() {
             listPost = db.getAllPosts().filter { it.status != "HAPUS" }
             applyFilters()
             swipeRefresh.isRefreshing = false
-        }
-
-        // Setup PopupMenu for btnFilter
-        btnFilter.setOnClickListener { view ->
-            val wrapper = android.view.ContextThemeWrapper(this, R.style.CustomPopupMenuTheme)
-            val popup = androidx.appcompat.widget.PopupMenu(wrapper, view)
-            popup.menu.add("Semua Kategori")
-            popup.menu.add("Elektronik")
-            popup.menu.add("Uang")
-            popup.menu.add("Alat Tulis/Buku")
-            popup.menu.add("Barang Pribadi")
-
-            popup.setOnMenuItemClickListener { item ->
-                currentCategory = item.title.toString()
-                applyFilters()
-                true
-            }
-            popup.show()
         }
 
         // Logika Search Berdasarkan Keakuratan

@@ -10,5 +10,6 @@ data class Barang(
     val tanggal: String,
     val deskripsi: String,
     val kontak: String,
-    val gambar: String
+    val gambar: String,
+    val selesai: Int = 0
 )

@@ -40,24 +40,10 @@ class RecentAdapter(
 
         holder.tvStatus.text = barang.status
 
-        when (barang.status.uppercase()) {
-
-            "HILANG" -> {
-                holder.tvStatus.setTextColor(Color.parseColor("#E53935"))
-            }
-
-            "DITEMUKAN" -> {
-                holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"))
-            }
-
-            "KEMBALI" -> {
-                holder.tvStatus.text = "HILANG"
-                holder.tvStatus.setTextColor(Color.parseColor("#E53935"))
-            }
-
-            else -> {
-                holder.tvStatus.setTextColor(Color.BLACK)
-            }
+        if (barang.selesai == 1) {
+            holder.tvStatus.setTextColor(Color.parseColor("#9E9E9E"))
+        } else {
+            holder.tvStatus.setTextColor(Color.parseColor("#E53935"))
         }
 
         holder.tvNamaBarang.text = barang.nama

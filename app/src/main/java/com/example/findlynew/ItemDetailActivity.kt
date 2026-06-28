@@ -164,13 +164,20 @@ class ItemDetailActivity : AppCompatActivity() {
             if (currentUserId == barang.userId) {
                 llOwnerActions.visibility = View.VISIBLE
 
-                if (barang.status.equals("Kembali", ignoreCase = true)) {
+                if (barang.selesai == 1) {
                     btnKembali.visibility = View.GONE
+
                     val params = btnHapus.layoutParams as LinearLayout.LayoutParams
                     params.marginEnd = 0
                     btnHapus.layoutParams = params
+
+                    tvTanggal.text = "Selesai pada: ${barang.tanggal}"
+
                 } else {
+
                     btnKembali.visibility = View.VISIBLE
+
+                    tvTanggal.text = "${barang.status} pada: ${barang.tanggal}"
                 }
 
                 btnHapus.setOnClickListener {
@@ -185,14 +192,14 @@ class ItemDetailActivity : AppCompatActivity() {
                 }
 
                 btnKembali.setOnClickListener {
-                    showCustomConfirmDialog("Konfirmasi", "Anda yakin ingin menandai barang ini sudah kembali?") {
-                        if (dbHelper.updatePostStatus(postId, "Kembali")) {
+                    showCustomConfirmDialog("Konfirmasi", "Apakah laporan ini sudah selesai?") {
+                        if (dbHelper.updatePostSelesai(postId, 1)) {
                             Toast.makeText(this, "Status barang berhasil diubah", Toast.LENGTH_SHORT).show()
                             btnKembali.visibility = View.GONE
                             val params = btnHapus.layoutParams as LinearLayout.LayoutParams
                             params.marginEnd = 0
                             btnHapus.layoutParams = params
-                            tvTanggal.text = "Kembali pada: ${barang.tanggal}"
+                            tvTanggal.text = "Selesai pada: ${barang.tanggal}"
                         } else {
                             Toast.makeText(this, "Gagal mengubah status", Toast.LENGTH_SHORT).show()
                         }

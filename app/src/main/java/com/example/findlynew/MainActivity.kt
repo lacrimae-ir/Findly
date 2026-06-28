@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         rvRecent.adapter = RecentAdapter(recentPosts)
 
         val etSearch = findViewById<EditText>(R.id.et_search)
-        val btnFilter = findViewById<ImageView>(R.id.btn_filter)
 
         etSearch.isFocusable = false
         etSearch.isFocusableInTouchMode = false
@@ -59,12 +58,6 @@ class MainActivity : AppCompatActivity() {
         etSearch.setOnClickListener {
             val intent = Intent(this, SeeAllActivity::class.java)
             intent.putExtra("OPEN_SEARCH", true)
-            startActivity(intent)
-        }
-
-        btnFilter.setOnClickListener {
-            val intent = Intent(this, SeeAllActivity::class.java)
-            intent.putExtra("OPEN_FILTER", true)
             startActivity(intent)
         }
 
@@ -133,5 +126,17 @@ class MainActivity : AppCompatActivity() {
                 androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val dbHelper = DatabaseHelper(this)
+
+        val recentPosts = dbHelper.getAllPosts()
+            .filter { it.status != "HAPUS" }
+            .take(5)
+
+        rvRecent.adapter = RecentAdapter(recentPosts)
     }
 }
