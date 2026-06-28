@@ -56,8 +56,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Lupa Password (sementara kosong)
         txtLupaPassword.setOnClickListener {
-            // TODO: buat halaman forgot password
-            Toast.makeText(this, "Fitur lupa password belum tersedia", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
         }
 
         // Login sukses, masuk ke MainActivity

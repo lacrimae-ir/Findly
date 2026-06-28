@@ -8,12 +8,16 @@ import com.google.android.material.textfield.TextInputEditText
 import android.content.Intent
 class ForgotPasswordActivity : AppCompatActivity() {
 
+    private lateinit var databaseHelper: DatabaseHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
+        databaseHelper = DatabaseHelper(this)
 
         // Inisialisasi View
         val btnBack = findViewById<ImageButton>(R.id.btnBack)
+        val etEmail = findViewById<TextInputEditText>(R.id.etEmail)
         val etPassword = findViewById<TextInputEditText>(R.id.etPassword)
         val etConfirmPassword = findViewById<TextInputEditText>(R.id.etConfirmPassword)
         val btnUpdatePassword = findViewById<Button>(R.id.btnUpdatePassword)
@@ -25,10 +29,17 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
         // Logika tombol update password
         btnUpdatePassword.setOnClickListener {
+            val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
             val confirmPassword = etConfirmPassword.text.toString().trim()
 
             // 1. Validasi jika input kosong
+            if (email.isEmpty()) {
+                etEmail.error = "Email tidak boleh kosong"
+                etEmail.requestFocus()
+                return@setOnClickListener
+            }
+
             if (password.isEmpty()) {
                 etPassword.error = "Password tidak boleh kosong"
                 etPassword.requestFocus()
@@ -56,27 +67,42 @@ class ForgotPasswordActivity : AppCompatActivity() {
             }
 
             // Jika semua validasi lolos
-            performUpdatePassword(password)
+            performUpdatePassword(email, password)
         }
     }
 
-    private fun performUpdatePassword(password: String) {
-        // 1. Tulis logika integrasi API / Firebase kamu di sini
+    private fun performUpdatePassword(
+        email: String,
+        password: String
+    ) {
 
-        // 2. Tampilkan pesan sukses
-        Toast.makeText(this, "Password berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+        val success = databaseHelper.updatePassword(email, password)
 
-        // 3. Berpindah ke Halaman Login
-        // Ganti 'LoginActivity' dengan nama kelas Activity Login yang sudah kamu buat
-        val intent = Intent(this, LoginActivity::class.java)
+        if (success) {
 
-        // Bendera (Flags) ini berfungsi untuk membersihkan tumpukan halaman (activity stack),
-        // sehingga pengguna tidak bisa pencet tombol 'Back' untuk kembali ke halaman ganti password.
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            Toast.makeText(
+                this,
+                "Password berhasil diperbarui!",
+                Toast.LENGTH_SHORT
+            ).show()
 
-        startActivity(intent)
+            val intent = Intent(this, LoginActivity::class.java)
 
-        // 4. Tutup semua activity sebelumnya
-        finishAffinity()
+            intent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+            startActivity(intent)
+            finish()
+
+        } else {
+
+            Toast.makeText(
+                this,
+                "Email tidak ditemukan!",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        }
     }
 }

@@ -61,18 +61,33 @@
             android:textStyle="bold"
             android:fontFamily="@font/poppins_medium"/>
 
-        <EditText
-            android:id="@+id/etLoginPassword"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan Password"
-            android:inputType="textPassword"
-            android:background="@drawable/input_bg"
-            android:padding="12dp"
-            android:textColor="#000000"
-            android:textColorHint="#999999"
-            android:fontFamily="@font/poppins_regular"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle"
+            app:endIconTint="#D3D3D3"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="#E0E0E0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLoginPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:background="@drawable/input_bg"
+                android:hint="Masukkan Password"
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Lupa Password -->
         <TextView

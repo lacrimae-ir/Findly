@@ -82,18 +82,33 @@
             android:textStyle="bold"
             android:fontFamily="@font/poppins_medium"/>
 
-        <EditText
-            android:id="@+id/etPassword"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="New Password"
-            android:inputType="textPassword"
-            android:background="@drawable/input_bg"
-            android:padding="12dp"
-            android:textColor="#000000"
-            android:textColorHint="#999999"
-            android:fontFamily="@font/poppins_regular"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle"
+            app:endIconTint="#D3D3D3"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="#E0E0E0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:background="@drawable/input_bg"
+                android:hint="New Password"
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Confirm Password -->
         <TextView
@@ -103,25 +118,40 @@
             android:textStyle="bold"
             android:fontFamily="@font/poppins_medium"/>
 
-        <EditText
-            android:id="@+id/etConfirmPassword"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Confirm Password"
-            android:inputType="textPassword"
-            android:background="@drawable/input_bg"
-            android:padding="12dp"
-            android:textColor="#000000"
-            android:textColorHint="#999999"
-            android:fontFamily="@font/poppins_regular"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="20dp"
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle"
+            app:endIconTint="#D3D3D3"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="#E0E0E0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:background="@drawable/input_bg"
+                android:hint="Confirm Password"
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:fontFamily="@font/poppins_regular"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Button Masuk -->
         <Button
             android:id="@+id/btnMasuk"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="MASUK"
+            android:text="DAFTAR"
             android:textAllCaps="true"
             android:textColor="#FFFFFF"
             android:fontFamily="@font/poppins_medium"
@@ -138,13 +168,5 @@
             android:textColor="#5B7FFF"
             android:fontFamily="@font/poppins_medium"
             android:layout_marginBottom="6dp"/>
-
-        <!-- Lupa Password -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lupa Password ?"
-            android:textColor="#5B7FFF"
-            android:fontFamily="@font/poppins_medium"/>
     </LinearLayout>
 </ScrollView>
