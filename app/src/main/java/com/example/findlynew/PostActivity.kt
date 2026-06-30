@@ -50,6 +50,14 @@ class PostActivity : AppCompatActivity() {
         ivUpload = findViewById<ImageView>(R.id.iv_upload_gambar)
         val btnSubmitForm = findViewById<Button>(R.id.btn_submit_form)
 
+        // Auto-fill kontak/wa using user's phone number
+        val sessionManager = SessionManager(this)
+        val email = sessionManager.getUserEmail() ?: ""
+        val userPhone = sessionManager.getPhone(email)
+        if (!userPhone.isNullOrEmpty()) {
+            etKontakBarang.setText(userPhone)
+        }
+
         // Logika Dropdown Tipe (Hilang/Ditemukan)
         val opsiTipe = arrayOf("Hilang", "Ditemukan")
         val adapterTipe = ArrayAdapter(this, R.layout.item_dropdown, opsiTipe)
@@ -126,33 +134,59 @@ class PostActivity : AppCompatActivity() {
                 }
                 else -> {
                     try {
-                        // Simpan gambar ke internal storage
-                        val imagePath = saveImageToInternalStorage(imageUri!!)
-                        
                         // Ambil user id dari session
                         val sessionManager = SessionManager(this@PostActivity)
                         val dbHelper = DatabaseHelper(this@PostActivity)
                         val email = sessionManager.getUserEmail() ?: ""
-                        val userId = dbHelper.getUserIdByEmail(email)
+                        val userId = sessionManager.getUserUid() ?: ""
 
-                        // Insert ke database
-                        val isInserted = dbHelper.insertPost(
-                            userId, nama, lokasi, tipe, kategori, tanggal, deskripsi, kontak, imagePath
-                        )
+                        val progressDialog = android.app.ProgressDialog(this@PostActivity).apply {
+                            setMessage("Mengunggah gambar ke Google Drive...")
+                            setCancelable(false)
+                            show()
+                        }
 
-                        if (isInserted) {
-                            // Check Preferences and Trigger Notification
-                            val preferences = sessionManager.getUserPreferences(email)
-                            val isMatch = preferences.any { it.equals(kategori, ignoreCase = true) }
-                            if (isMatch) {
-                                showNotification(nama)
+                        DriveImageUploader.uploadImage(this@PostActivity, imageUri!!, "post") { driveUrl ->
+                            runOnUiThread {
+                                if (driveUrl != null) {
+                                    progressDialog.setMessage("Menyimpan laporan ke Firebase...")
+                                    val newBarang = Barang(
+                                        id = "",
+                                        userId = userId,
+                                        nama = nama,
+                                        lokasi = lokasi,
+                                        status = tipe,
+                                        kategori = kategori,
+                                        tanggal = tanggal,
+                                        deskripsi = deskripsi,
+                                        kontak = kontak,
+                                        gambar = driveUrl,
+                                        selesai = 0,
+                                        del = false
+                                    )
+                                    FirebaseManager.insertPost(newBarang) { success ->
+                                        runOnUiThread {
+                                            progressDialog.dismiss()
+                                            if (success) {
+                                                val preferences = dbHelper.getUserPreferences(email)
+                                                val isMatch = preferences.any { it.equals(kategori, ignoreCase = true) }
+                                                if (isMatch) {
+                                                    showNotification(nama)
+                                                }
+
+                                                Toast.makeText(this@PostActivity, "Laporan $tipe Berhasil Diposting!", Toast.LENGTH_LONG).show()
+                                                startActivity(Intent(this@PostActivity, MainActivity::class.java))
+                                                finish()
+                                            } else {
+                                                Toast.makeText(this@PostActivity, "Gagal menyimpan laporan", Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    progressDialog.dismiss()
+                                    Toast.makeText(this@PostActivity, "Gagal mengunggah gambar ke Google Drive. Hubungkan Google Apps Script Anda.", Toast.LENGTH_LONG).show()
+                                }
                             }
-
-                            Toast.makeText(this@PostActivity, "Laporan $tipe Berhasil Diposting!", Toast.LENGTH_LONG).show()
-                            startActivity(Intent(this@PostActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            Toast.makeText(this@PostActivity, "Gagal menyimpan laporan", Toast.LENGTH_LONG).show()
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()

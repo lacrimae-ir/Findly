@@ -9,6 +9,7 @@
 
     <!-- Unread Dot (Mocked) -->
     <View
+        android:id="@+id/vNotificationDot"
         android:layout_width="8dp"
         android:layout_height="8dp"
         android:background="@drawable/bg_popup_rounded"

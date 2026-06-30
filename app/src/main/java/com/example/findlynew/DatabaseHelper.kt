@@ -4,315 +4,440 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.util.ArrayList
+import java.util.HashSet
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+    init {
+        initializeInMemory(context)
+    }
 
     companion object {
-        private const val DATABASE_VERSION = 5
+        private const val DATABASE_VERSION = 11
         private const val DATABASE_NAME = "FindlyDB.db"
 
-        // Tabel User
-        private const val TABLE_USER = "users"
-        private const val COLUMN_USER_ID = "user_id"
-        private const val COLUMN_USER_NAME = "user_name"
-        private const val COLUMN_USER_EMAIL = "user_email"
-        private const val COLUMN_USER_PASSWORD = "user_password"
+        // Tabel Preferences
+        private const val TABLE_PREFERENCES = "preferences"
+        private const val COLUMN_PREF_ID = "pref_id"
+        private const val COLUMN_PREF_EMAIL = "user_email"
+        private const val COLUMN_PREF_CATEGORY = "category_name"
 
-        // Tabel Post
-        private const val TABLE_POST = "posts"
-        private const val COLUMN_POST_ID = "post_id"
-        private const val COLUMN_POST_USER_ID = "user_id"
-        private const val COLUMN_POST_NAMA_BARANG = "nama_barang"
-        private const val COLUMN_POST_LOKASI = "lokasi"
-        private const val COLUMN_POST_STATUS = "status"
-        private const val COLUMN_POST_KATEGORI = "kategori"
-        private const val COLUMN_POST_TANGGAL = "tanggal"
-        private const val COLUMN_POST_DESKRIPSI = "deskripsi"
-        private const val COLUMN_POST_KONTAK = "kontak"
-        private const val COLUMN_POST_GAMBAR = "gambar"
-        private const val COLUMN_POST_SELESAI = "selesai"
+        // Tabel Preference Details
+        private const val TABLE_PREF_DETAILS = "preference_details"
+        private const val COLUMN_DET_ID = "detail_id"
+        private const val COLUMN_DET_EMAIL = "user_email"
+        private const val COLUMN_DET_TEXT = "additional_info"
+
+        // Tabel Notifications
+        private const val TABLE_NOTIFS = "notifications_store"
+        private const val COLUMN_NOTIF_ID = "notif_store_id"
+        private const val COLUMN_NOTIF_EMAIL = "user_email"
+        private const val COLUMN_NOTIF_POST_ID = "post_id"
+        private const val COLUMN_NOTIF_TIMESTAMP = "timestamp"
+        private const val COLUMN_NOTIF_IS_READ = "is_read"
+
+        // Tabel Search History
+        private const val TABLE_SEARCH = "search_history"
+        private const val COLUMN_SEARCH_ID = "search_id"
+        private const val COLUMN_SEARCH_EMAIL = "user_email"
+        private const val COLUMN_SEARCH_QUERY = "query"
+        private const val COLUMN_SEARCH_TIMESTAMP = "timestamp"
+
+        // In-Memory Data for Mock/Transition to Firebase
+        data class TempUser(
+            val id: String,
+            val name: String,
+            val email: String,
+            var password: String
+        )
+
+        private val usersList = mutableListOf<TempUser>().apply {
+            add(TempUser("1", "Admin Findly", "admin@findly.com", "password123"))
+        }
+        private val postsList = mutableListOf<Barang>()
+        private var isInMemoryInitialized = false
+
+        private fun initializeInMemory(context: Context) {
+            if (isInMemoryInitialized) return
+            val file = java.io.File(context.filesDir, "itemplaceholder.png")
+            if (!file.exists()) {
+                try {
+                    val resId = context.resources.getIdentifier("itemplaceholder", "drawable", context.packageName)
+                    if (resId != 0) {
+                        val inputStream = context.resources.openRawResource(resId)
+                        val outputStream = java.io.FileOutputStream(file)
+                        inputStream.copyTo(outputStream)
+                        inputStream.close()
+                        outputStream.close()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            val imagePath = file.absolutePath
+
+            // Initial 5 Dummy Posts
+            postsList.add(Barang("1", "1", "Dompet Kulit Cokelat", "Kantin FISIP", "Hilang", "Uang", "28/6/2026", "Dompet kulit berwarna cokelat merk Eiger, berisi KTP atas nama Rian, KTM, dan beberapa uang tunai.", "081234567890", imagePath, 0, false))
+            postsList.add(Barang("2", "1", "Kunci Motor Honda", "Parkiran Gd. FIK", "Ditemukan", "Lainnya", "29/6/2026", "Ditemukan gantungan kunci motor Honda dengan gantungan boneka kecil di parkiran motor FIK.", "089876543210", imagePath, 0, false))
+            postsList.add(Barang("3", "1", "Laptop Asus TUF", "Perpustakaan Pusat", "Hilang", "Elektronik", "25/6/2026", "Laptop Asus TUF Gaming warna hitam, tertinggal di meja lantai 2 perpustakaan pusat. Ada stiker anime di cover depan.", "081211223344", imagePath, 0, false))
+            postsList.add(Barang("4", "1", "Tumbler Hydro Flask", "Gd. Rektorat Lt. 3", "Ditemukan", "Lainnya", "30/6/2026", "Ditemukan tumbler Hydro Flask warna biru muda di selasar depan ruang rapat rektorat.", "085544332211", imagePath, 0, false))
+            postsList.add(Barang("5", "1", "Kacamata Hitam", "Masjid UPNVJ", "Hilang", "Aksesoris", "27/6/2026", "Kacamata minus dengan frame hitam bulat. Terakhir diletakkan di tempat wudhu laki-laki masjid.", "087788990011", imagePath, 0, false))
+
+            isInMemoryInitialized = true
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTableUser = ("CREATE TABLE " + TABLE_USER + "("
-                + COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_USER_NAME + " TEXT,"
-                + COLUMN_USER_EMAIL + " TEXT,"
-                + COLUMN_USER_PASSWORD + " TEXT" + ")")
-        db.execSQL(createTableUser)
+        val createTablePreferences = ("CREATE TABLE " + TABLE_PREFERENCES + "("
+                + COLUMN_PREF_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_PREF_EMAIL + " TEXT,"
+                + COLUMN_PREF_CATEGORY + " TEXT" + ")")
+        db.execSQL(createTablePreferences)
 
-        val createTablePost = ("CREATE TABLE " + TABLE_POST + "("
-                + COLUMN_POST_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_POST_USER_ID + " INTEGER,"
-                + COLUMN_POST_NAMA_BARANG + " TEXT,"
-                + COLUMN_POST_LOKASI + " TEXT,"
-                + COLUMN_POST_STATUS + " TEXT,"
-                + COLUMN_POST_KATEGORI + " TEXT,"
-                + COLUMN_POST_TANGGAL + " TEXT,"
-                + COLUMN_POST_DESKRIPSI + " TEXT,"
-                + COLUMN_POST_KONTAK + " TEXT,"
-                + COLUMN_POST_GAMBAR + " TEXT,"
-                + COLUMN_POST_SELESAI + " INTEGER DEFAULT 0,"
-                + "FOREIGN KEY(" + COLUMN_POST_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_USER_ID + "))")
-        db.execSQL(createTablePost)
+        val createTablePrefDetails = ("CREATE TABLE " + TABLE_PREF_DETAILS + "("
+                + COLUMN_DET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_DET_EMAIL + " TEXT UNIQUE,"
+                + COLUMN_DET_TEXT + " TEXT" + ")")
+        db.execSQL(createTablePrefDetails)
+
+        val createTableNotifs = ("CREATE TABLE " + TABLE_NOTIFS + "("
+                + COLUMN_NOTIF_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_NOTIF_EMAIL + " TEXT,"
+                + COLUMN_NOTIF_POST_ID + " TEXT,"
+                + COLUMN_NOTIF_TIMESTAMP + " INTEGER,"
+                + COLUMN_NOTIF_IS_READ + " INTEGER DEFAULT 0,"
+                + "UNIQUE(" + COLUMN_NOTIF_EMAIL + ", " + COLUMN_NOTIF_POST_ID + ") ON CONFLICT IGNORE)")
+        db.execSQL(createTableNotifs)
+
+        val createTableSearch = ("CREATE TABLE " + TABLE_SEARCH + "("
+                + COLUMN_SEARCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_SEARCH_EMAIL + " TEXT,"
+                + COLUMN_SEARCH_QUERY + " TEXT,"
+                + COLUMN_SEARCH_TIMESTAMP + " INTEGER" + ")")
+        db.execSQL(createTableSearch)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_POST)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREF_DETAILS)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFS)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SEARCH)
+        db.execSQL("DROP TABLE IF EXISTS posts")
+        db.execSQL("DROP TABLE IF EXISTS users")
         onCreate(db)
     }
 
-    fun insertUser(name: String, email: String, password: String): Boolean {
+    // Preferences Operations (SQLite)
+    fun saveUserPreferences(email: String, preferences: Set<String>): Boolean {
         val db = this.writableDatabase
-        val values = ContentValues()
-        values.put(COLUMN_USER_NAME, name)
-        values.put(COLUMN_USER_EMAIL, email)
-        values.put(COLUMN_USER_PASSWORD, password)
-
-        val success = db.insert(TABLE_USER, null, values)
-        db.close()
-        return (Integer.parseInt("$success") != -1)
-    }
-
-    fun checkUser(email: String, password: String): Boolean {
-        val columns = arrayOf(COLUMN_USER_ID)
-        val db = this.readableDatabase
-        val selection = "$COLUMN_USER_EMAIL = ? AND $COLUMN_USER_PASSWORD = ?"
-        val selectionArgs = arrayOf(email, password)
-
-        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
-        val cursorCount = cursor.count
-        cursor.close()
-        db.close()
-
-        return cursorCount > 0
-    }
-
-    fun checkEmailExists(email: String): Boolean {
-        val columns = arrayOf(COLUMN_USER_ID)
-        val db = this.readableDatabase
-        val selection = "$COLUMN_USER_EMAIL = ?"
-        val selectionArgs = arrayOf(email)
-
-        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
-        val cursorCount = cursor.count
-        cursor.close()
-        db.close()
-
-        return cursorCount > 0
-    }
-
-    fun getUserName(email: String): String {
-        var name = ""
-        val db = this.readableDatabase
-        val columns = arrayOf(COLUMN_USER_NAME)
-        val selection = "$COLUMN_USER_EMAIL = ?"
-        val selectionArgs = arrayOf(email)
-        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
-        
-        if (cursor.moveToFirst()) {
-            val nameIndex = cursor.getColumnIndex(COLUMN_USER_NAME)
-            if (nameIndex != -1) {
-                name = cursor.getString(nameIndex)
-            }
-        }
-        cursor.close()
-        db.close()
-        return name
-    }
-
-    fun getUserIdByEmail(email: String): Int {
-        var id = -1
-        val db = this.readableDatabase
-        val columns = arrayOf(COLUMN_USER_ID)
-        val selection = "$COLUMN_USER_EMAIL = ?"
-        val selectionArgs = arrayOf(email)
-        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
-        
-        if (cursor.moveToFirst()) {
-            val idIndex = cursor.getColumnIndex(COLUMN_USER_ID)
-            if (idIndex != -1) {
-                id = cursor.getInt(idIndex)
-            }
-        }
-        cursor.close()
-        db.close()
-        return id
-    }
-
-    fun getUserNameById(userId: Int): String {
-        var name = "Unknown"
-        val db = this.readableDatabase
-        val columns = arrayOf(COLUMN_USER_NAME)
-        val selection = "$COLUMN_USER_ID = ?"
-        val selectionArgs = arrayOf(userId.toString())
-        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
-        
-        if (cursor.moveToFirst()) {
-            val nameIndex = cursor.getColumnIndex(COLUMN_USER_NAME)
-            if (nameIndex != -1) {
-                name = cursor.getString(nameIndex)
-            }
-        }
-        cursor.close()
-        db.close()
-        return name
-    }
-
-    fun insertPost(userId: Int, nama: String, lokasi: String, status: String, kategori: String, tanggal: String, deskripsi: String, kontak: String, gambar: String): Boolean {
-        val db = this.writableDatabase
-        val values = ContentValues()
-        values.put(COLUMN_POST_USER_ID, userId)
-        values.put(COLUMN_POST_NAMA_BARANG, nama)
-        values.put(COLUMN_POST_LOKASI, lokasi)
-        values.put(COLUMN_POST_STATUS, status)
-        values.put(COLUMN_POST_KATEGORI, kategori)
-        values.put(COLUMN_POST_TANGGAL, tanggal)
-        values.put(COLUMN_POST_DESKRIPSI, deskripsi)
-        values.put(COLUMN_POST_KONTAK, kontak)
-        values.put(COLUMN_POST_GAMBAR, gambar)
-        values.put(COLUMN_POST_SELESAI, 0)
-
-        val success = db.insert(TABLE_POST, null, values)
-        db.close()
-        return (Integer.parseInt("$success") != -1)
-    }
-
-    fun getAllPosts(): List<Barang> {
-        val postList = ArrayList<Barang>()
-        val db = this.readableDatabase
-        val selectQuery = "SELECT * FROM $TABLE_POST ORDER BY $COLUMN_POST_ID DESC"
-        val cursor = db.rawQuery(selectQuery, null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val idIndex = cursor.getColumnIndex(COLUMN_POST_ID)
-                val userIdIndex = cursor.getColumnIndex(COLUMN_POST_USER_ID)
-                val namaIndex = cursor.getColumnIndex(COLUMN_POST_NAMA_BARANG)
-                val lokasiIndex = cursor.getColumnIndex(COLUMN_POST_LOKASI)
-                val statusIndex = cursor.getColumnIndex(COLUMN_POST_STATUS)
-                val kategoriIndex = cursor.getColumnIndex(COLUMN_POST_KATEGORI)
-                val tanggalIndex = cursor.getColumnIndex(COLUMN_POST_TANGGAL)
-                val deskripsiIndex = cursor.getColumnIndex(COLUMN_POST_DESKRIPSI)
-                val kontakIndex = cursor.getColumnIndex(COLUMN_POST_KONTAK)
-                val gambarIndex = cursor.getColumnIndex(COLUMN_POST_GAMBAR)
-                val selesaiIndex = cursor.getColumnIndex(COLUMN_POST_SELESAI)
-
-                if (idIndex != -1 && userIdIndex != -1 && namaIndex != -1 && lokasiIndex != -1 && 
-                    statusIndex != -1 && kategoriIndex != -1 && tanggalIndex != -1 && 
-                    deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1 && selesaiIndex != -1) {
-                    
-                    val barang = Barang(
-                        id = cursor.getInt(idIndex),
-                        userId = cursor.getInt(userIdIndex),
-                        nama = cursor.getString(namaIndex),
-                        lokasi = cursor.getString(lokasiIndex),
-                        status = cursor.getString(statusIndex),
-                        kategori = cursor.getString(kategoriIndex),
-                        tanggal = cursor.getString(tanggalIndex),
-                        deskripsi = cursor.getString(deskripsiIndex),
-                        kontak = cursor.getString(kontakIndex),
-                        gambar = cursor.getString(gambarIndex),
-                        selesai = cursor.getInt(selesaiIndex)
-                    )
-                    postList.add(barang)
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_PREFERENCES, "$COLUMN_PREF_EMAIL = ?", arrayOf(email))
+            for (pref in preferences) {
+                val values = ContentValues().apply {
+                    put(COLUMN_PREF_EMAIL, email)
+                    put(COLUMN_PREF_CATEGORY, pref)
                 }
-            } while (cursor.moveToNext())
+                db.insert(TABLE_PREFERENCES, null, values)
+            }
+            db.setTransactionSuccessful()
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        } finally {
+            db.endTransaction()
+            db.close()
         }
-        cursor.close()
-        db.close()
-        return postList
     }
 
-    fun getPostById(postId: Int): Barang? {
-        var barang: Barang? = null
+    fun getUserPreferences(email: String): Set<String> {
+        val preferences = HashSet<String>()
         val db = this.readableDatabase
-        val selection = "$COLUMN_POST_ID = ?"
-        val selectionArgs = arrayOf(postId.toString())
-        val cursor = db.query(TABLE_POST, null, selection, selectionArgs, null, null, null)
-
+        val cursor = db.query(
+            TABLE_PREFERENCES,
+            arrayOf(COLUMN_PREF_CATEGORY),
+            "$COLUMN_PREF_EMAIL = ?",
+            arrayOf(email),
+            null, null, null
+        )
         if (cursor.moveToFirst()) {
-            val idIndex = cursor.getColumnIndex(COLUMN_POST_ID)
-            val userIdIndex = cursor.getColumnIndex(COLUMN_POST_USER_ID)
-            val namaIndex = cursor.getColumnIndex(COLUMN_POST_NAMA_BARANG)
-            val lokasiIndex = cursor.getColumnIndex(COLUMN_POST_LOKASI)
-            val statusIndex = cursor.getColumnIndex(COLUMN_POST_STATUS)
-            val kategoriIndex = cursor.getColumnIndex(COLUMN_POST_KATEGORI)
-            val tanggalIndex = cursor.getColumnIndex(COLUMN_POST_TANGGAL)
-            val deskripsiIndex = cursor.getColumnIndex(COLUMN_POST_DESKRIPSI)
-            val kontakIndex = cursor.getColumnIndex(COLUMN_POST_KONTAK)
-            val gambarIndex = cursor.getColumnIndex(COLUMN_POST_GAMBAR)
-            val selesaiIndex = cursor.getColumnIndex(COLUMN_POST_SELESAI)
-
-            if (idIndex != -1 && userIdIndex != -1 && namaIndex != -1 && lokasiIndex != -1 && 
-                statusIndex != -1 && kategoriIndex != -1 && tanggalIndex != -1 && 
-                deskripsiIndex != -1 && kontakIndex != -1 && gambarIndex != -1 && selesaiIndex != -1) {
-                
-                barang = Barang(
-                    id = cursor.getInt(idIndex),
-                    userId = cursor.getInt(userIdIndex),
-                    nama = cursor.getString(namaIndex),
-                    lokasi = cursor.getString(lokasiIndex),
-                    status = cursor.getString(statusIndex),
-                    kategori = cursor.getString(kategoriIndex),
-                    tanggal = cursor.getString(tanggalIndex),
-                    deskripsi = cursor.getString(deskripsiIndex),
-                    kontak = cursor.getString(kontakIndex),
-                    gambar = cursor.getString(gambarIndex),
-                    selesai = cursor.getInt(selesaiIndex)
-                )
+            val categoryIndex = cursor.getColumnIndex(COLUMN_PREF_CATEGORY)
+            if (categoryIndex != -1) {
+                do {
+                    preferences.add(cursor.getString(categoryIndex))
+                } while (cursor.moveToNext())
             }
         }
         cursor.close()
         db.close()
-        return barang
+        return preferences
     }
 
-    fun updatePostStatus(postId: Int, newStatus: String): Boolean {
+    fun savePreferenceDetail(email: String, details: String): Boolean {
         val db = this.writableDatabase
-        val values = ContentValues()
-        values.put(COLUMN_POST_STATUS, newStatus)
+        try {
+            val values = ContentValues().apply {
+                put(COLUMN_DET_EMAIL, email)
+                put(COLUMN_DET_TEXT, details)
+            }
+            val affected = db.insertWithOnConflict(
+                TABLE_PREF_DETAILS,
+                null,
+                values,
+                SQLiteDatabase.CONFLICT_REPLACE
+            )
+            return affected != -1L
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        } finally {
+            db.close()
+        }
+    }
 
-        val success = db.update(TABLE_POST, values, "$COLUMN_POST_ID=?", arrayOf(postId.toString()))
+    fun getPreferenceDetail(email: String): String {
+        var detail = ""
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_PREF_DETAILS,
+            arrayOf(COLUMN_DET_TEXT),
+            "$COLUMN_DET_EMAIL = ?",
+            arrayOf(email),
+            null, null, null
+        )
+        if (cursor.moveToFirst()) {
+            val textIndex = cursor.getColumnIndex(COLUMN_DET_TEXT)
+            if (textIndex != -1) {
+                detail = cursor.getString(textIndex) ?: ""
+            }
+        }
+        cursor.close()
+        db.close()
+        return detail
+    }
+
+    fun insertNotification(email: String, postId: String): Boolean {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put(COLUMN_NOTIF_EMAIL, email)
+                put(COLUMN_NOTIF_POST_ID, postId)
+                put(COLUMN_NOTIF_TIMESTAMP, System.currentTimeMillis())
+            }
+            val affected = db.insert(TABLE_NOTIFS, null, values)
+            return affected != -1L
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        } finally {
+            db.close()
+        }
+    }
+
+    fun getNotificationIds(email: String): List<Pair<String, Boolean>> {
+        val list = ArrayList<Pair<String, Boolean>>()
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_NOTIFS,
+            arrayOf(COLUMN_NOTIF_POST_ID, COLUMN_NOTIF_IS_READ),
+            "$COLUMN_NOTIF_EMAIL = ?",
+            arrayOf(email),
+            null, null,
+            "$COLUMN_NOTIF_TIMESTAMP DESC"
+        )
+        if (cursor.moveToFirst()) {
+            val postIndex = cursor.getColumnIndex(COLUMN_NOTIF_POST_ID)
+            val readIndex = cursor.getColumnIndex(COLUMN_NOTIF_IS_READ)
+            if (postIndex != -1 && readIndex != -1) {
+                do {
+                    val postId = cursor.getString(postIndex)
+                    val isRead = cursor.getInt(readIndex) == 1
+                    list.add(Pair(postId, isRead))
+                } while (cursor.moveToNext())
+            }
+        }
+        cursor.close()
+        db.close()
+        return list
+    }
+
+    fun getUnreadNotificationCount(email: String): Int {
+        var count = 0
+        val db = this.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM $TABLE_NOTIFS WHERE $COLUMN_NOTIF_EMAIL = ? AND $COLUMN_NOTIF_IS_READ = 0",
+            arrayOf(email)
+        )
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0)
+        }
+        cursor.close()
+        db.close()
+        return count
+    }
+
+    fun markNotificationsAsRead(email: String) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put(COLUMN_NOTIF_IS_READ, 1)
+            }
+            db.update(TABLE_NOTIFS, values, "$COLUMN_NOTIF_EMAIL = ?", arrayOf(email))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+    }
+
+    // Search History Operations (SQLite)
+    fun insertSearchQuery(email: String, query: String): Boolean {
+        val trimmedQuery = query.trim()
+        if (trimmedQuery.isEmpty()) return false
+        val db = this.writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_SEARCH, "$COLUMN_SEARCH_EMAIL = ? AND $COLUMN_SEARCH_QUERY = ?", arrayOf(email, trimmedQuery))
+            val values = ContentValues().apply {
+                put(COLUMN_SEARCH_EMAIL, email)
+                put(COLUMN_SEARCH_QUERY, trimmedQuery)
+                put(COLUMN_SEARCH_TIMESTAMP, System.currentTimeMillis())
+            }
+            db.insert(TABLE_SEARCH, null, values)
+            
+            // Limit search history to 10 entries per user
+            val deleteQuery = "DELETE FROM $TABLE_SEARCH WHERE $COLUMN_SEARCH_ID NOT IN (" +
+                    "SELECT $COLUMN_SEARCH_ID FROM $TABLE_SEARCH " +
+                    "WHERE $COLUMN_SEARCH_EMAIL = ? " +
+                    "ORDER BY $COLUMN_SEARCH_TIMESTAMP DESC LIMIT 10)"
+            db.execSQL(deleteQuery, arrayOf(email))
+            
+            db.setTransactionSuccessful()
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
+    }
+
+    fun getSearchHistory(email: String): List<String> {
+        val history = ArrayList<String>()
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_SEARCH,
+            arrayOf(COLUMN_SEARCH_QUERY),
+            "$COLUMN_SEARCH_EMAIL = ?",
+            arrayOf(email),
+            null, null,
+            "$COLUMN_SEARCH_TIMESTAMP DESC"
+        )
+        if (cursor.moveToFirst()) {
+            val queryIndex = cursor.getColumnIndex(COLUMN_SEARCH_QUERY)
+            if (queryIndex != -1) {
+                do {
+                    history.add(cursor.getString(queryIndex))
+                } while (cursor.moveToNext())
+            }
+        }
+        cursor.close()
+        db.close()
+        return history
+    }
+
+    fun deleteSearchQuery(email: String, query: String): Boolean {
+        val db = this.writableDatabase
+        val success = db.delete(TABLE_SEARCH, "$COLUMN_SEARCH_EMAIL = ? AND $COLUMN_SEARCH_QUERY = ?", arrayOf(email, query))
         db.close()
         return success > 0
     }
 
-    fun updatePostSelesai(postId: Int, selesai: Int): Boolean {
+    fun clearSearchHistory(email: String): Boolean {
         val db = this.writableDatabase
-        val values = ContentValues()
-
-        values.put(COLUMN_POST_SELESAI, selesai)
-
-        val result = db.update(
-            TABLE_POST,
-            values,
-            "$COLUMN_POST_ID=?",
-            arrayOf(postId.toString())
-        )
-
+        val success = db.delete(TABLE_SEARCH, "$COLUMN_SEARCH_EMAIL = ?", arrayOf(email))
         db.close()
+        return success > 0
+    }
 
-        return result > 0
+    // In-Memory User Operations
+    fun insertUser(name: String, email: String, password: String): Boolean {
+        if (checkEmailExists(email)) return false
+        val newId = if (usersList.isEmpty()) "1" else ((usersList.mapNotNull { it.id.toIntOrNull() }.maxOrNull() ?: 0) + 1).toString()
+        usersList.add(TempUser(newId, name, email, password))
+        return true
+    }
+
+    fun checkUser(email: String, password: String): Boolean {
+        return usersList.any { it.email.equals(email, ignoreCase = true) && it.password == password }
+    }
+
+    fun checkEmailExists(email: String): Boolean {
+        return usersList.any { it.email.equals(email, ignoreCase = true) }
+    }
+
+    fun getUserName(email: String): String {
+        return usersList.find { it.email.equals(email, ignoreCase = true) }?.name ?: ""
+    }
+
+    fun getUserIdByEmail(email: String): String {
+        return usersList.find { it.email.equals(email, ignoreCase = true) }?.id ?: ""
+    }
+
+    fun getUserNameById(userId: String): String {
+        return usersList.find { it.id == userId }?.name ?: "Unknown"
     }
 
     fun updatePassword(email: String, newPassword: String): Boolean {
+        val user = usersList.find { it.email.equals(email, ignoreCase = true) }
+        return if (user != null) {
+            user.password = newPassword
+            true
+        } else {
+            false
+        }
+    }
 
-        val db = writableDatabase
+    // In-Memory Post Operations
+    fun insertPost(userId: String, nama: String, lokasi: String, status: String, kategori: String, tanggal: String, deskripsi: String, kontak: String, gambar: String): Boolean {
+        val newId = if (postsList.isEmpty()) "1" else ((postsList.mapNotNull { it.id.toIntOrNull() }.maxOrNull() ?: 0) + 1).toString()
+        postsList.add(Barang(newId, userId, nama, lokasi, status, kategori, tanggal, deskripsi, kontak, gambar, 0, false))
+        return true
+    }
 
-        val values = ContentValues()
-        values.put(COLUMN_USER_PASSWORD, newPassword)
+    fun getAllPosts(): List<Barang> {
+        return ArrayList(postsList)
+    }
 
-        val result = db.update(
-            TABLE_USER,
-            values,
-            "$COLUMN_USER_EMAIL=?",
-            arrayOf(email)
-        )
+    fun getPostById(postId: String): Barang? {
+        return postsList.find { it.id == postId }
+    }
 
-        db.close()
+    fun updatePostStatus(postId: String, newStatus: String): Boolean {
+        val post = postsList.find { it.id == postId }
+        return if (post != null) {
+            val index = postsList.indexOf(post)
+            val updatedPost = post.copy(status = newStatus)
+            postsList[index] = updatedPost
+            true
+        } else {
+            false
+        }
+    }
 
-        return result > 0
+    fun updatePostSelesai(postId: String, selesai: Int): Boolean {
+        val post = postsList.find { it.id == postId }
+        return if (post != null) {
+            val index = postsList.indexOf(post)
+            val updatedPost = post.copy(selesai = selesai)
+            postsList[index] = updatedPost
+            true
+        } else {
+            false
+        }
     }
 }

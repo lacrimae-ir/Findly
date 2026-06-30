@@ -5,11 +5,16 @@
     android:background="#F5F6FA">
 
     <!-- SCROLLABLE CONTENT -->
-    <ScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="100dp"
-        android:clipToPadding="false">
+        android:layout_marginBottom="60dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,6 +42,7 @@
                 android:gravity="center">
 
                 <ImageView
+                    android:id="@+id/ivProfilePicture"
                     android:layout_width="110dp"
                     android:layout_height="110dp"
                     android:src="@drawable/profile"
@@ -172,6 +178,8 @@
 
         </LinearLayout>
     </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- BOTTOM NAVBAR: melayang di atas konten -->
     <include layout="@layout/bottom_navbar" />

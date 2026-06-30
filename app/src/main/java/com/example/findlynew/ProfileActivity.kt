@@ -16,15 +16,16 @@ class ProfileActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        val tvProfileName = findViewById<TextView>(R.id.tvProfileName)
-        val tvProfileEmail = findViewById<TextView>(R.id.tvProfileEmail)
         val menuSettings = findViewById<LinearLayout>(R.id.menuSettings)
         val menuPreferencesProfile = findViewById<LinearLayout>(R.id.menuPreferencesProfile)
         val menuLogout = findViewById<LinearLayout>(R.id.menuLogout)
 
-        // Set Data
-        tvProfileName.text = sessionManager.getUserName()
-        tvProfileEmail.text = sessionManager.getUserEmail()
+        val swipeRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipe_refresh)
+        swipeRefresh.setOnRefreshListener {
+            loadProfileData()
+        }
+
+        loadProfileData()
 
         // Menu Actions
         menuSettings.setOnClickListener {
@@ -37,6 +38,11 @@ class ProfileActivity : AppCompatActivity() {
 
         // Logout
         menuLogout.setOnClickListener {
+            try {
+                stopService(Intent(this, NotificationService::class.java))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             sessionManager.logout()
             val intent = Intent(this, LoginActivity::class.java)
             // Clear entire activity stack so user can't go back
@@ -62,6 +68,62 @@ class ProfileActivity : AppCompatActivity() {
 
         navProfile.setOnClickListener {
             // Already in Profile
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadProfileData()
+    }
+
+    private fun loadProfileData() {
+        val tvProfileName = findViewById<TextView>(R.id.tvProfileName)
+        val tvProfileEmail = findViewById<TextView>(R.id.tvProfileEmail)
+        val ivProfilePicture = findViewById<android.widget.ImageView>(R.id.ivProfilePicture)
+        val swipeRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipe_refresh)
+
+        val email = sessionManager.getUserEmail() ?: ""
+        tvProfileName.text = sessionManager.getUserName()
+        tvProfileEmail.text = email
+
+        val profilePicUrl = sessionManager.getProfilePic(email)
+        if (!profilePicUrl.isNullOrEmpty()) {
+            com.bumptech.glide.Glide.with(this)
+                .load(profilePicUrl)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .circleCrop()
+                .into(ivProfilePicture)
+        } else {
+            ivProfilePicture.setImageResource(R.drawable.profile)
+        }
+
+        val uid = sessionManager.getUserUid() ?: ""
+        if (uid.isNotEmpty()) {
+            FirebaseManager.getUserById(uid) { user ->
+                runOnUiThread {
+                    swipeRefresh.isRefreshing = false
+                    if (user != null) {
+                        sessionManager.saveUserName(user.username)
+                        sessionManager.savePhone(user.email, user.phone)
+                        if (user.profilePic.isNotEmpty()) {
+                            sessionManager.saveProfilePic(user.email, user.profilePic)
+                        }
+
+                        tvProfileName.text = user.username
+                        if (user.profilePic.isNotEmpty()) {
+                            com.bumptech.glide.Glide.with(this@ProfileActivity)
+                                .load(user.profilePic)
+                                .placeholder(R.drawable.profile)
+                                .error(R.drawable.profile)
+                                .circleCrop()
+                                .into(ivProfilePicture)
+                        }
+                    }
+                }
+            }
+        } else {
+            swipeRefresh.isRefreshing = false
         }
     }
 }

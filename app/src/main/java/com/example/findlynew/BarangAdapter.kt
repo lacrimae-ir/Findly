@@ -35,7 +35,11 @@ class BarangAdapter(private var listBarang: List<Barang>) : RecyclerView.Adapter
             holder.tvStatus.setTextColor(Color.parseColor("#E53935"))
         }
 
-        holder.ivBarang.setImageURI(android.net.Uri.parse(barang.gambar))
+        com.bumptech.glide.Glide.with(holder.itemView.context)
+            .load(barang.gambar)
+            .placeholder(R.drawable.itemplaceholder)
+            .error(R.drawable.itemplaceholder)
+            .into(holder.ivBarang)
         holder.tvNamaBarang.text = barang.nama
         
         // Handle click

@@ -74,21 +74,35 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val isValid = databaseHelper.checkUser(email, password)
-            if (isValid) {
-                // Get name and save to session
-                val name = databaseHelper.getUserName(email)
-                sessionManager.saveLoginSession(name, email)
-                
-                Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
-                if (sessionManager.hasCompletedSurvey(email)) {
-                    startActivity(Intent(this, MainActivity::class.java))
-                } else {
-                    startActivity(Intent(this, SurveyPreferencesActivity::class.java))
+            val progressDialog = android.app.ProgressDialog(this).apply {
+                setMessage("Sedang masuk...")
+                setCancelable(false)
+                show()
+            }
+
+            FirebaseManager.checkUser(email, password) { user ->
+                runOnUiThread {
+                    progressDialog.dismiss()
+                    if (user != null) {
+                        sessionManager.saveLoginSession(user.username, user.email, user.uid)
+                        if (user.profilePic.isNotEmpty()) {
+                            sessionManager.saveProfilePic(user.email, user.profilePic)
+                        }
+                        if (user.phone.isNotEmpty()) {
+                            sessionManager.savePhone(user.email, user.phone)
+                        }
+                        
+                        Toast.makeText(this@LoginActivity, "Login berhasil!", Toast.LENGTH_SHORT).show()
+                        if (sessionManager.hasCompletedSurvey(email)) {
+                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        } else {
+                            startActivity(Intent(this@LoginActivity, SurveyPreferencesActivity::class.java))
+                        }
+                        finish()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "Email atau Password salah", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                finish()
-            } else {
-                Toast.makeText(this, "Email atau Password salah", Toast.LENGTH_SHORT).show()
             }
         }
     }

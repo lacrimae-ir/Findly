@@ -48,9 +48,11 @@ class RecentAdapter(
 
         holder.tvNamaBarang.text = barang.nama
 
-        if (barang.gambar.isNotEmpty()) {
-            holder.ivBarang.setImageURI(Uri.parse(barang.gambar))
-        }
+        com.bumptech.glide.Glide.with(holder.itemView.context)
+            .load(barang.gambar)
+            .placeholder(R.drawable.itemplaceholder)
+            .error(R.drawable.itemplaceholder)
+            .into(holder.ivBarang)
 
         holder.btnSeeDetails.setOnClickListener {
 

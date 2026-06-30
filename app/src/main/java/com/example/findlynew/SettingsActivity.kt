@@ -33,8 +33,7 @@ class SettingsActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed() // Menutup halaman settings dan kembali ke profile
         }
 
-        // Set nama pengguna dari session manager
-        tvSettingsName.text = sessionManager.getUserName()
+        loadSettingsData()
 
         // Aksi Menu Edit Profile
         menuEditProfile.setOnClickListener {
@@ -42,8 +41,12 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Inisialisasi status switch notifikasi dari Session
+        switchNotifications.isChecked = sessionManager.isPushNotificationsEnabled()
+
         // Aksi Toggle Switch Push Notifications
         switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+            sessionManager.setPushNotificationsEnabled(isChecked)
             if (isChecked) {
                 Toast.makeText(this, "Notifikasi Diaktifkan", Toast.LENGTH_SHORT).show()
             } else {
@@ -53,7 +56,39 @@ class SettingsActivity : AppCompatActivity() {
 
         // Aksi Menu Customer Service
         menuCustomerService.setOnClickListener {
-            Toast.makeText(this, "Menuju halaman Customer Service", Toast.LENGTH_SHORT).show()
+            try {
+                val phoneNumber = "6281387282456"
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    data = android.net.Uri.parse("https://wa.me/$phoneNumber")
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Gagal membuka WhatsApp: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadSettingsData()
+    }
+
+    private fun loadSettingsData() {
+        val tvSettingsName = findViewById<TextView>(R.id.tvSettingsName)
+        val ivSettingsProfile = findViewById<android.widget.ImageView>(R.id.ivSettingsProfile)
+
+        tvSettingsName.text = sessionManager.getUserName()
+        val email = sessionManager.getUserEmail() ?: ""
+        val profilePicUrl = sessionManager.getProfilePic(email)
+        if (!profilePicUrl.isNullOrEmpty()) {
+            com.bumptech.glide.Glide.with(this)
+                .load(profilePicUrl)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .circleCrop()
+                .into(ivSettingsProfile)
+        } else {
+            ivSettingsProfile.setImageResource(R.drawable.profile)
         }
     }
 }

@@ -80,20 +80,34 @@ class SignupActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (databaseHelper.checkEmailExists(email)) {
-                Toast.makeText(this, "Email sudah terdaftar!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            val progressDialog = android.app.ProgressDialog(this).apply {
+                setMessage("Sedang mendaftarkan akun...")
+                setCancelable(false)
+                show()
             }
 
-            val isInserted = databaseHelper.insertUser(name, email, password)
-            if (isInserted) {
-                // Auto login after registration
-                sessionManager.saveLoginSession(name, email)
-                Toast.makeText(this, "Registrasi berhasil, langsung masuk", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, SurveyPreferencesActivity::class.java))
-                finish()
-            } else {
-                Toast.makeText(this, "Registrasi gagal", Toast.LENGTH_SHORT).show()
+            FirebaseManager.checkEmailExists(email) { exists ->
+                runOnUiThread {
+                    if (exists) {
+                        progressDialog.dismiss()
+                        Toast.makeText(this@SignupActivity, "Email sudah terdaftar!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val newUser = User(uid = "", username = name, email = email, password = password, profilePic = "")
+                        FirebaseManager.insertUser(newUser) { uid ->
+                            runOnUiThread {
+                                progressDialog.dismiss()
+                                if (uid != null) {
+                                    sessionManager.saveLoginSession(name, email, uid)
+                                    Toast.makeText(this@SignupActivity, "Registrasi berhasil, langsung masuk", Toast.LENGTH_SHORT).show()
+                                    startActivity(Intent(this@SignupActivity, SurveyPreferencesActivity::class.java))
+                                    finish()
+                                } else {
+                                    Toast.makeText(this@SignupActivity, "Registrasi gagal", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

@@ -75,34 +75,51 @@ class ForgotPasswordActivity : AppCompatActivity() {
         email: String,
         password: String
     ) {
+        val progressDialog = android.app.ProgressDialog(this).apply {
+            setMessage("Memverifikasi email...")
+            setCancelable(false)
+            show()
+        }
 
-        val success = databaseHelper.updatePassword(email, password)
+        FirebaseManager.checkEmailExists(email) { exists ->
+            runOnUiThread {
+                if (!exists) {
+                    progressDialog.dismiss()
+                    val etEmail = findViewById<TextInputEditText>(R.id.etEmail)
+                    etEmail.error = "Email tidak terdaftar!"
+                    etEmail.requestFocus()
+                    Toast.makeText(
+                        this@ForgotPasswordActivity,
+                        "Email tidak terdaftar di sistem!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    progressDialog.setMessage("Memperbarui password...")
+                    FirebaseManager.updatePassword(email, password) { success ->
+                        runOnUiThread {
+                            progressDialog.dismiss()
+                            if (success) {
+                                Toast.makeText(
+                                    this@ForgotPasswordActivity,
+                                    "Password berhasil diperbarui!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-        if (success) {
-
-            Toast.makeText(
-                this,
-                "Password berhasil diperbarui!",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            val intent = Intent(this, LoginActivity::class.java)
-
-            intent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-            startActivity(intent)
-            finish()
-
-        } else {
-
-            Toast.makeText(
-                this,
-                "Email tidak ditemukan!",
-                Toast.LENGTH_SHORT
-            ).show()
-
+                                val intent = Intent(this@ForgotPasswordActivity, LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this@ForgotPasswordActivity,
+                                    "Gagal memperbarui password!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

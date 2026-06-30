@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -45,6 +46,10 @@
             android:exported="false" />
             
         <activity
+            android:name=".SurveyPreferencesDetailActivity"
+            android:exported="false" />
+            
+        <activity
             android:name=".PostActivity"
             android:exported="false" />
 
@@ -55,6 +60,11 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <activity
             android:name=".ForgotPasswordActivity"
@@ -71,6 +81,20 @@
         <activity
             android:name=".SeeAllActivity"
             android:exported="false" />
+
+        <service
+            android:name=".NotificationService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

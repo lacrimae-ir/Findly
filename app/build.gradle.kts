@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -46,4 +47,11 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.photoview)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.database)
+    implementation(libs.glide)
+    annotationProcessor(libs.glide.compiler)
+    implementation(libs.okhttp)
+    implementation(libs.jbcrypt)
+    implementation(libs.ucrop)
 }

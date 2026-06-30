@@ -56,6 +56,13 @@ class ItemDetailActivity : AppCompatActivity() {
             val progress = if (collapsedTranslationY > 0f)
                 (translation / collapsedTranslationY).coerceIn(0f, 1f) else 0f
             floatingWrapper.translationY = floatingWrapper.height * progress
+
+            val newHeight = bottomSheet.y.toInt()
+            if (newHeight > 0) {
+                val params = ivFoto.layoutParams
+                params.height = newHeight
+                ivFoto.layoutParams = params
+            }
         }
 
         // Animasi snap ke target translationY
@@ -135,88 +142,158 @@ class ItemDetailActivity : AppCompatActivity() {
         })
 
         // Get intent extras
-        val postId = intent.getIntExtra("EXTRA_POST_ID", -1)
-        
-        val dbHelper = DatabaseHelper(this)
-        val barang = dbHelper.getPostById(postId)
-        
-        if (barang != null) {
-            val uploaderName = dbHelper.getUserNameById(barang.userId)
-            
-            ivFoto.setImageURI(android.net.Uri.parse(barang.gambar))
-            tvNama.text = barang.nama
-            tvKategori.text = "Kategori: ${barang.kategori}"
-            tvTanggal.text = "${barang.status} pada: ${barang.tanggal}"
-            tvLokasi.text = "Lokasi: ${barang.lokasi}"
-            tvDeskripsi.text = barang.deskripsi
-            tvUploader.text = uploaderName
-            tvKontak.text = barang.kontak
+        val postId = intent.getStringExtra("EXTRA_POST_ID") ?: ""
 
-            // Check if current user is the owner
-            val sessionManager = SessionManager(this)
-            val currentUserEmail = sessionManager.getUserEmail()
-            val currentUserId = if (currentUserEmail != null) dbHelper.getUserIdByEmail(currentUserEmail) else -1
+        val swipeRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipe_refresh)
+        swipeRefresh.setOnRefreshListener {
+            loadPostDetails(postId, false)
+        }
 
-            val llOwnerActions = findViewById<LinearLayout>(R.id.ll_owner_actions)
-            val btnHapus = findViewById<Button>(R.id.btn_hapus)
-            val btnKembali = findViewById<Button>(R.id.btn_kembali)
+        loadPostDetails(postId, true)
+    }
 
-            if (currentUserId == barang.userId) {
-                llOwnerActions.visibility = View.VISIBLE
+    private fun loadPostDetails(postId: String, showDialog: Boolean) {
+        val ivFoto = findViewById<com.github.chrisbanes.photoview.PhotoView>(R.id.iv_detail_foto)
+        val tvNama = findViewById<TextView>(R.id.tv_detail_nama)
+        val tvKategori = findViewById<TextView>(R.id.tv_detail_kategori)
+        val tvTanggal = findViewById<TextView>(R.id.tv_detail_tanggal)
+        val tvLokasi = findViewById<TextView>(R.id.tv_detail_lokasi)
+        val tvDeskripsi = findViewById<TextView>(R.id.tv_detail_deskripsi)
+        val tvUploader = findViewById<TextView>(R.id.tv_detail_uploader)
+        val tvKontak = findViewById<TextView>(R.id.tv_detail_kontak)
+        val swipeRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipe_refresh)
 
-                if (barang.selesai == 1) {
-                    btnKembali.visibility = View.GONE
-
-                    val params = btnHapus.layoutParams as LinearLayout.LayoutParams
-                    params.marginEnd = 0
-                    btnHapus.layoutParams = params
-
-                    tvTanggal.text = "Selesai pada: ${barang.tanggal}"
-
-                } else {
-
-                    btnKembali.visibility = View.VISIBLE
-
-                    tvTanggal.text = "${barang.status} pada: ${barang.tanggal}"
-                }
-
-                btnHapus.setOnClickListener {
-                    showCustomConfirmDialog("Konfirmasi", "Anda yakin ingin menghapus barang ini?") {
-                        if (dbHelper.updatePostStatus(postId, "HAPUS")) {
-                            Toast.makeText(this, "Barang berhasil dihapus", Toast.LENGTH_SHORT).show()
-                            finish() // close activity and return
-                        } else {
-                            Toast.makeText(this, "Gagal menghapus barang", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-
-                btnKembali.setOnClickListener {
-                    showCustomConfirmDialog("Konfirmasi", "Apakah laporan ini sudah selesai?") {
-                        if (dbHelper.updatePostSelesai(postId, 1)) {
-                            Toast.makeText(this, "Status barang berhasil diubah", Toast.LENGTH_SHORT).show()
-                            btnKembali.visibility = View.GONE
-                            val params = btnHapus.layoutParams as LinearLayout.LayoutParams
-                            params.marginEnd = 0
-                            btnHapus.layoutParams = params
-                            tvTanggal.text = "Selesai pada: ${barang.tanggal}"
-                        } else {
-                            Toast.makeText(this, "Gagal mengubah status", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            } else {
-                llOwnerActions.visibility = View.GONE
+        val progressDialog = if (showDialog) {
+            android.app.ProgressDialog(this).apply {
+                setMessage("Memuat data barang...")
+                setCancelable(false)
+                show()
             }
-        } else {
-            // Handle error, data not found
-            tvNama.text = "Data Tidak Ditemukan"
-            tvKategori.text = "Kategori: -"
-            tvTanggal.text = "- pada: -"
-            tvLokasi.text = "Lokasi: -"
-            tvDeskripsi.text = "-"
-            tvUploader.text = "-"
-            tvKontak.text = "-"
+        } else null
+
+        FirebaseManager.getPostById(postId) { barang ->
+            runOnUiThread {
+                progressDialog?.dismiss()
+                swipeRefresh.isRefreshing = false
+                if (barang != null) {
+                    FirebaseManager.getUserNameById(barang.userId) { uploaderName ->
+                        runOnUiThread {
+                            com.bumptech.glide.Glide.with(this@ItemDetailActivity)
+                                .load(barang.gambar)
+                                .placeholder(R.drawable.itemplaceholder)
+                                .error(R.drawable.itemplaceholder)
+                                .into(ivFoto)
+                            tvNama.text = barang.nama
+                            tvKategori.text = "Kategori: ${barang.kategori}"
+                            tvTanggal.text = "${barang.status} pada: ${barang.tanggal}"
+                            tvLokasi.text = "Lokasi: ${barang.lokasi}"
+                            tvDeskripsi.text = barang.deskripsi
+                            tvUploader.text = uploaderName
+                            tvKontak.text = barang.kontak
+                            tvKontak.setTextColor(android.graphics.Color.parseColor("#236CDF"))
+                            tvKontak.paintFlags = tvKontak.paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG
+                            tvKontak.setOnClickListener {
+                                try {
+                                    var clean = barang.kontak.replace(Regex("[^0-9]"), "")
+                                    if (clean.startsWith("0")) {
+                                        clean = "62" + clean.substring(1)
+                                    } else if (clean.startsWith("8")) {
+                                        clean = "62" + clean
+                                    }
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        data = android.net.Uri.parse("https://wa.me/$clean")
+                                    }
+                                    startActivity(intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@ItemDetailActivity, "Gagal membuka WhatsApp", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+
+                            // Check if current user is the owner
+                            val sessionManager = SessionManager(this@ItemDetailActivity)
+                            val currentUserId = sessionManager.getUserUid() ?: ""
+
+                            val llOwnerActions = findViewById<LinearLayout>(R.id.ll_owner_actions)
+                            val btnHapus = findViewById<Button>(R.id.btn_hapus)
+                            val btnKembali = findViewById<Button>(R.id.btn_kembali)
+
+                            if (currentUserId == barang.userId) {
+                                llOwnerActions.visibility = View.VISIBLE
+
+                                if (barang.selesai == 1) {
+                                    btnKembali.visibility = View.GONE
+
+                                    val params = btnHapus.layoutParams as LinearLayout.LayoutParams
+                                    params.marginEnd = 0
+                                    btnHapus.layoutParams = params
+
+                                    tvTanggal.text = "Selesai pada: ${barang.tanggal}"
+
+                                } else {
+                                    btnKembali.visibility = View.VISIBLE
+                                    tvTanggal.text = "${barang.status} pada: ${barang.tanggal}"
+                                }
+
+                                btnHapus.setOnClickListener {
+                                    showCustomConfirmDialog("Konfirmasi", "Anda yakin ingin menghapus barang ini?") {
+                                        val deleteProgress = android.app.ProgressDialog(this@ItemDetailActivity).apply {
+                                            setMessage("Menghapus barang...")
+                                            setCancelable(false)
+                                            show()
+                                        }
+                                        FirebaseManager.updatePostStatus(postId, "HAPUS") { success ->
+                                            runOnUiThread {
+                                                deleteProgress.dismiss()
+                                                if (success) {
+                                                    Toast.makeText(this@ItemDetailActivity, "Barang berhasil dihapus", Toast.LENGTH_SHORT).show()
+                                                    finish()
+                                                } else {
+                                                    Toast.makeText(this@ItemDetailActivity, "Gagal menghapus barang", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                btnKembali.setOnClickListener {
+                                    showCustomConfirmDialog("Konfirmasi", "Apakah laporan ini sudah selesai?") {
+                                        val updateProgress = android.app.ProgressDialog(this@ItemDetailActivity).apply {
+                                            setMessage("Mengubah status...")
+                                            setCancelable(false)
+                                            show()
+                                        }
+                                        FirebaseManager.updatePostSelesai(postId, 1) { success ->
+                                            runOnUiThread {
+                                                updateProgress.dismiss()
+                                                if (success) {
+                                                    Toast.makeText(this@ItemDetailActivity, "Status barang berhasil diubah", Toast.LENGTH_SHORT).show()
+                                                    btnKembali.visibility = View.GONE
+                                                    val params = btnHapus.layoutParams as LinearLayout.LayoutParams
+                                                    params.marginEnd = 0
+                                                    btnHapus.layoutParams = params
+                                                    tvTanggal.text = "Selesai pada: ${barang.tanggal}"
+                                                } else {
+                                                    Toast.makeText(this@ItemDetailActivity, "Gagal mengubah status", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                llOwnerActions.visibility = View.GONE
+                            }
+                        }
+                    }
+                } else {
+                    tvNama.text = "Data Tidak Ditemukan"
+                    tvKategori.text = "Kategori: -"
+                    tvTanggal.text = "- pada: -"
+                    tvLokasi.text = "Lokasi: -"
+                    tvDeskripsi.text = "-"
+                    tvUploader.text = "-"
+                    tvKontak.text = "-"
+                }
+            }
         }
 
         // Setup Bottom Navbar

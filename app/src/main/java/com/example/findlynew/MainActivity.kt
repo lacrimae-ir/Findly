@@ -32,14 +32,6 @@ class MainActivity : AppCompatActivity() {
         rvCategories = findViewById(R.id.rv_categories)
         rvRecent = findViewById(R.id.rv_recent)
 
-        val dbHelper = DatabaseHelper(this)
-
-        val recentPosts = dbHelper.getAllPosts()
-            .filter { it.status != "HAPUS" }
-            .take(5)
-
-        rvRecent.adapter = RecentAdapter(recentPosts)
-
         rvRecent.layoutManager =
             LinearLayoutManager(
                 this,
@@ -47,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                 false
             )
 
-        rvRecent.adapter = RecentAdapter(recentPosts)
+        loadRecentPosts()
 
         val etSearch = findViewById<EditText>(R.id.et_search)
 
@@ -75,7 +67,8 @@ class MainActivity : AppCompatActivity() {
         rvCategories.adapter = CategoryAdapter(categoryList) { category ->
 
             val intent = Intent(this, SeeAllActivity::class.java)
-            intent.putExtra("CATEGORY", category.name)
+            val cleanCategory = category.name.replace("\n", "")
+            intent.putExtra("CATEGORY", cleanCategory)
             startActivity(intent)
 
         }
@@ -126,17 +119,139 @@ class MainActivity : AppCompatActivity() {
                 androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
             }
         }
+
+        val swipeRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipe_refresh)
+        swipeRefresh.setOnRefreshListener {
+            loadRecentPosts()
+        }
+
+        // Start background notification service
+        try {
+            val serviceIntent = Intent(this, NotificationService::class.java)
+            startService(serviceIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        loadRecentPosts()
+        updateNotificationBadge()
+    }
+
+    private fun loadRecentPosts() {
+        FirebaseManager.getAllPosts { posts ->
+            checkNewNotifications(posts)
+            val sortedRecent = posts
+                .filter { it.status != "HAPUS" && !it.del }
+                .sortedByDescending { it.id }
+                .take(5)
+            runOnUiThread {
+                rvRecent.adapter = RecentAdapter(sortedRecent)
+                updateNotificationBadge()
+                findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipe_refresh).isRefreshing = false
+            }
+        }
+    }
+
+    private fun checkNewNotifications(posts: List<Barang>) {
+        val sessionManager = SessionManager(this)
+        val email = sessionManager.getUserEmail() ?: ""
+        if (email.isEmpty()) return
 
         val dbHelper = DatabaseHelper(this)
+        val preferences = dbHelper.getUserPreferences(email)
+        val detailText = dbHelper.getPreferenceDetail(email)
 
-        val recentPosts = dbHelper.getAllPosts()
-            .filter { it.status != "HAPUS" }
-            .take(5)
+        // Read currently saved notif IDs to see which ones are new
+        val savedNotifIds = dbHelper.getNotificationIds(email).map { it.first }.toSet()
 
-        rvRecent.adapter = RecentAdapter(recentPosts)
+        for (post in posts) {
+            if (post.status != "HAPUS" && !post.del && !savedNotifIds.contains(post.id)) {
+                val points = calculatePoints(post, preferences, detailText)
+                val categoryMatched = preferences.any { it.equals(post.kategori, ignoreCase = true) }
+                if (points >= 15 || categoryMatched) {
+                    // It's a new match!
+                    dbHelper.insertNotification(email, post.id)
+                    if (sessionManager.isPushNotificationsEnabled()) {
+                        triggerSystemNotification(post.nama, post.id)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun calculatePoints(post: Barang, categories: Set<String>, detailText: String): Int {
+        var points = 0
+        val categoryMatched = categories.any { it.equals(post.kategori, ignoreCase = true) }
+        if (categoryMatched) {
+            points += 10
+        }
+        if (detailText.isNotEmpty()) {
+            val cleanDetail = detailText.trim()
+            val postNameLower = post.nama.lowercase()
+            val postDescLower = post.deskripsi.lowercase()
+            if (postNameLower.contains(cleanDetail.lowercase())) points += 15
+            if (postDescLower.contains(cleanDetail.lowercase())) points += 10
+            val stopWords = setOf("dan", "atau", "saya", "yang", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "sering", "mencari", "ada", "bisa", "pada", "adalah")
+            val words = cleanDetail.lowercase().split(Regex("[\\s,\\.\\-\\?]+")).filter { it.length >= 3 && !stopWords.contains(it) }
+            for (word in words) {
+                if (postNameLower.contains(word)) points += 5
+                if (postDescLower.contains(word)) points += 2
+            }
+        }
+        return points
+    }
+
+    private fun triggerSystemNotification(namaBarang: String, postId: String) {
+        val intent = android.content.Intent(this, ItemDetailActivity::class.java).apply {
+            putExtra("EXTRA_POST_ID", postId)
+            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent = android.app.PendingIntent.getActivity(
+            this, 
+            System.currentTimeMillis().toInt(), 
+            intent, 
+            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val builder = androidx.core.app.NotificationCompat.Builder(this, "FINDLY_NOTIFICATIONS")
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setContentTitle("Barang temuan baru cocok dengan Anda!")
+            .setContentText(namaBarang)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        val notificationManager = androidx.core.app.NotificationManagerCompat.from(this)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+            }
+        } else {
+            notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+        }
+    }
+
+    private fun updateNotificationBadge() {
+        val sessionManager = SessionManager(this)
+        val email = sessionManager.getUserEmail() ?: ""
+        if (email.isEmpty()) return
+
+        val dbHelper = DatabaseHelper(this)
+        val unreadCount = dbHelper.getUnreadNotificationCount(email)
+
+        val tvBadge = findViewById<android.widget.TextView>(R.id.tvNotificationBadge)
+        if (unreadCount > 0) {
+            tvBadge.visibility = android.view.View.VISIBLE
+            if (unreadCount > 99) {
+                tvBadge.text = "99+"
+            } else {
+                tvBadge.text = unreadCount.toString()
+            }
+        } else {
+            tvBadge.visibility = android.view.View.GONE
+        }
     }
 }

@@ -10,14 +10,22 @@ class SessionManager(context: Context) {
         const val KEY_IS_LOGGED_IN = "isLoggedIn"
         const val KEY_USER_NAME = "userName"
         const val KEY_USER_EMAIL = "userEmail"
+        const val KEY_USER_UID = "userUid"
         const val KEY_HAS_COMPLETED_SURVEY = "hasCompletedSurvey"
     }
 
-    fun saveLoginSession(name: String, email: String) {
+    fun saveLoginSession(name: String, email: String, uid: String) {
         val editor = prefs.edit()
         editor.putBoolean(KEY_IS_LOGGED_IN, true)
         editor.putString(KEY_USER_NAME, name)
         editor.putString(KEY_USER_EMAIL, email)
+        editor.putString(KEY_USER_UID, uid)
+        editor.apply()
+    }
+
+    fun saveUserName(name: String) {
+        val editor = prefs.edit()
+        editor.putString(KEY_USER_NAME, name)
         editor.apply()
     }
 
@@ -27,6 +35,10 @@ class SessionManager(context: Context) {
 
     fun getUserEmail(): String? {
         return prefs.getString(KEY_USER_EMAIL, "email@domain.com")
+    }
+
+    fun getUserUid(): String? {
+        return prefs.getString(KEY_USER_UID, "")
     }
 
     fun isLoggedIn(): Boolean {
@@ -43,6 +55,26 @@ class SessionManager(context: Context) {
         editor.apply()
     }
 
+    fun savePhone(email: String, phone: String) {
+        val editor = prefs.edit()
+        editor.putString("phone_$email", phone)
+        editor.apply()
+    }
+
+    fun getPhone(email: String): String? {
+        return prefs.getString("phone_$email", "")
+    }
+
+    fun isPushNotificationsEnabled(): Boolean {
+        return prefs.getBoolean("push_notifications_enabled", false)
+    }
+
+    fun setPushNotificationsEnabled(enabled: Boolean) {
+        val editor = prefs.edit()
+        editor.putBoolean("push_notifications_enabled", enabled)
+        editor.apply()
+    }
+
     fun getUserPreferences(email: String): Set<String> {
         return prefs.getStringSet("preferences_$email", emptySet()) ?: emptySet()
     }
@@ -51,6 +83,16 @@ class SessionManager(context: Context) {
         val editor = prefs.edit()
         editor.putStringSet("preferences_$email", preferences)
         editor.apply()
+    }
+
+    fun saveProfilePic(email: String, url: String) {
+        val editor = prefs.edit()
+        editor.putString("profile_pic_$email", url)
+        editor.apply()
+    }
+
+    fun getProfilePic(email: String): String? {
+        return prefs.getString("profile_pic_$email", null)
     }
 
     fun logout() {

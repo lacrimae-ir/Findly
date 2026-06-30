@@ -22,8 +22,9 @@ class SurveyPreferencesActivity : AppCompatActivity() {
         )
 
         val sessionManager = SessionManager(this)
+        val dbHelper = DatabaseHelper(this)
         val email = sessionManager.getUserEmail() ?: ""
-        val savedPreferences = sessionManager.getUserPreferences(email)
+        val savedPreferences = dbHelper.getUserPreferences(email)
 
         val selectedStates = mutableMapOf<Button, Boolean>()
 
@@ -59,22 +60,21 @@ class SurveyPreferencesActivity : AppCompatActivity() {
         val btnLanjut = findViewById<Button>(R.id.btnLanjut)
         btnLanjut.setOnClickListener {
             if (email.isNotEmpty()) {
-                val currentPreferences = selectedStates.filter { it.value }.keys.map { it.text.toString() }.toSet()
-                sessionManager.saveUserPreferences(email, currentPreferences)
-                sessionManager.setSurveyCompleted(email, true)
+                val currentPreferences = selectedStates.filter { it.value }.keys.map { button ->
+                    val text = button.text.toString().trim()
+                    when (text.uppercase(java.util.Locale.ROOT)) {
+                        "ELEKTRONIK" -> "Elektronik"
+                        "UANG" -> "Uang"
+                        "ALAT TULIS / BUKU", "ALAT TULIS/BUKU" -> "Alat Tulis/Buku"
+                        "PAKAIAN" -> "Pakaian"
+                        "AKSESORIS" -> "Aksesoris"
+                        "OTHERS", "LAINNYA" -> "Lainnya"
+                        else -> text
+                    }
+                }.toSet()
+                dbHelper.saveUserPreferences(email, currentPreferences)
             }
-            // If opened from settings, we might just want to finish(). But for simplicity, going to MainActivity is fine.
-            // Or better, check if the calling activity was SettingsActivity. If so, just finish().
-            // But going to MainActivity is safe. Let's just finish() if it's not from Login/Signup.
-            // A simple way is to check if it's from Settings. Let's just finish() to go back to previous screen.
-            // Wait, LoginActivity calls finish() after starting SurveyPreferencesActivity. 
-            // So if we just finish(), the app will close if coming from LoginActivity!
-            // Let's explicitly go to MainActivity if we are coming from Login (where we might not have a backstack).
-            // Since LoginActivity starts this and calls finish(), we MUST start MainActivity.
-            // However, from SettingsActivity we don't call finish(). 
-            // So we can start MainActivity with Intent.FLAG_ACTIVITY_CLEAR_TOP.
-            val intent = Intent(this, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            val intent = Intent(this, SurveyPreferencesDetailActivity::class.java)
             startActivity(intent)
             finish()
         }

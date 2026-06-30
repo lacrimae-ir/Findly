@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "229863341894",
+    "firebase_url": "https://database-findly-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "database-findly",
+    "storage_bucket": "database-findly.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:229863341894:android:21bbddabbb319ad97caf47",
+        "android_client_info": {
+          "package_name": "com.example.findlynew"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy-Tcpl401HiN3UDz06XB0K-Jmmk47hVU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
