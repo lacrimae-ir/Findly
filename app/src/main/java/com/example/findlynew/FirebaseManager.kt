@@ -72,7 +72,7 @@ object FirebaseManager {
             })
     }
 
-    fun updatePassword(email: String, passwordEntered: String, callback: (Boolean) -> Unit) {
+    fun updatePassword(email: String, passwordEntered: String, callback: (String?) -> Unit) {
         databaseReference.child("users").orderByChild("email").equalTo(email)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -89,16 +89,16 @@ object FirebaseManager {
                                         updated = true
                                     }
                                     if (counter.toLong() == childrenCount) {
-                                        callback(updated)
+                                        callback(if (updated) hashedPassword else null)
                                     }
                                 }
                         }
                     } else {
-                        callback(false)
+                        callback(null)
                     }
                 }
                 override fun onCancelled(error: DatabaseError) {
-                    callback(false)
+                    callback(null)
                 }
             })
     }

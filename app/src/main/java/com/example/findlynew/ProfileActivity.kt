@@ -100,10 +100,20 @@ class ProfileActivity : AppCompatActivity() {
 
         val uid = sessionManager.getUserUid() ?: ""
         if (uid.isNotEmpty()) {
+            val localHash = sessionManager.getPasswordHash() ?: ""
             FirebaseManager.getUserById(uid) { user ->
                 runOnUiThread {
                     swipeRefresh.isRefreshing = false
                     if (user != null) {
+                        if (localHash.isNotEmpty()) {
+                            if (user.password != localHash) {
+                                forceLogout("Sesi Anda telah berakhir karena password telah diubah.")
+                                return@runOnUiThread
+                            }
+                        } else {
+                            sessionManager.savePasswordHash(user.password)
+                        }
+
                         sessionManager.saveUserName(user.username)
                         sessionManager.savePhone(user.email, user.phone)
                         if (user.profilePic.isNotEmpty()) {
@@ -125,5 +135,19 @@ class ProfileActivity : AppCompatActivity() {
         } else {
             swipeRefresh.isRefreshing = false
         }
+    }
+
+    private fun forceLogout(message: String) {
+        try {
+            stopService(Intent(this, NotificationService::class.java))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        sessionManager.logout()
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

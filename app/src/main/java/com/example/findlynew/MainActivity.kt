@@ -136,6 +136,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        validateSession()
         loadRecentPosts()
         updateNotificationBadge()
     }
@@ -253,5 +254,45 @@ class MainActivity : AppCompatActivity() {
         } else {
             tvBadge.visibility = android.view.View.GONE
         }
+    }
+
+    private fun validateSession() {
+        val sessionManager = SessionManager(this)
+        val uid = sessionManager.getUserUid() ?: ""
+        val localHash = sessionManager.getPasswordHash() ?: ""
+        
+        if (!sessionManager.isLoggedIn() || uid.isEmpty()) return
+
+        FirebaseManager.getUserById(uid) { user ->
+            runOnUiThread {
+                if (user != null) {
+                    if (localHash.isNotEmpty()) {
+                        if (user.password != localHash) {
+                            forceLogout("Sesi Anda telah berakhir karena password telah diubah.")
+                        }
+                    } else {
+                        // Save the password hash for existing logged-in users upgrading the app
+                        sessionManager.savePasswordHash(user.password)
+                    }
+                } else {
+                    forceLogout("Akun tidak ditemukan. Silakan login kembali.")
+                }
+            }
+        }
+    }
+
+    private fun forceLogout(message: String) {
+        val sessionManager = SessionManager(this)
+        try {
+            stopService(Intent(this, NotificationService::class.java))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        sessionManager.logout()
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

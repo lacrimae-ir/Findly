@@ -7,13 +7,12 @@
     android:gravity="center_vertical"
     android:background="#FFFFFF">
 
-    <!-- Unread Dot (Mocked) -->
+    <!-- Unread Dot -->
     <View
         android:id="@+id/vNotificationDot"
         android:layout_width="8dp"
         android:layout_height="8dp"
-        android:background="@drawable/bg_popup_rounded"
-        android:backgroundTint="#FF3B30"
+        android:background="@drawable/bg_unread_dot"
         android:layout_marginEnd="12dp" />
 
     <!-- Text Info -->

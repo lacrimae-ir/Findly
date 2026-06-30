@@ -140,9 +140,12 @@ class EditProfileActivity : AppCompatActivity() {
             val uid = sessionManager.getUserUid() ?: ""
 
             // local success helper
-            val finalizeChanges = { finalProfilePic: String? ->
+            val finalizeChanges = { finalProfilePic: String?, newPasswordHash: String? ->
                 if (finalProfilePic != null) {
                     sessionManager.saveProfilePic(email, finalProfilePic)
+                }
+                if (newPasswordHash != null) {
+                    sessionManager.savePasswordHash(newPasswordHash)
                 }
                 sessionManager.savePhone(email, phone)
                 progressSave.dismiss()
@@ -155,14 +158,31 @@ class EditProfileActivity : AppCompatActivity() {
                 FirebaseManager.updatePhone(uid, phone) { phoneSuccess ->
                     runOnUiThread {
                         if (phoneSuccess) {
-                            if (finalProfilePic != null) {
-                                FirebaseManager.updateProfilePic(uid, finalProfilePic) { picSuccess ->
+                            val onPhoneAndPicDone = { newPasswordHash: String? ->
+                                if (finalProfilePic != null) {
+                                    FirebaseManager.updateProfilePic(uid, finalProfilePic) { picSuccess ->
+                                        runOnUiThread {
+                                            finalizeChanges(finalProfilePic, newPasswordHash)
+                                        }
+                                    }
+                                } else {
+                                    finalizeChanges(null, newPasswordHash)
+                                }
+                            }
+
+                            if (password.isNotEmpty()) {
+                                FirebaseManager.updatePassword(email, password) { newHash ->
                                     runOnUiThread {
-                                        finalizeChanges(finalProfilePic)
+                                        if (newHash != null) {
+                                            onPhoneAndPicDone(newHash)
+                                        } else {
+                                            progressSave.dismiss()
+                                            Toast.makeText(this@EditProfileActivity, "Gagal memperbarui password", Toast.LENGTH_SHORT).show()
+                                        }
                                     }
                                 }
                             } else {
-                                finalizeChanges(null)
+                                onPhoneAndPicDone(null)
                             }
                         } else {
                             progressSave.dismiss()

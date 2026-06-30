@@ -12,6 +12,7 @@ class SessionManager(context: Context) {
         const val KEY_USER_EMAIL = "userEmail"
         const val KEY_USER_UID = "userUid"
         const val KEY_HAS_COMPLETED_SURVEY = "hasCompletedSurvey"
+        const val KEY_PASSWORD_HASH = "passwordHash"
     }
 
     fun saveLoginSession(name: String, email: String, uid: String) {
@@ -95,11 +96,23 @@ class SessionManager(context: Context) {
         return prefs.getString("profile_pic_$email", null)
     }
 
+    fun savePasswordHash(hash: String) {
+        val editor = prefs.edit()
+        editor.putString(KEY_PASSWORD_HASH, hash)
+        editor.apply()
+    }
+
+    fun getPasswordHash(): String? {
+        return prefs.getString(KEY_PASSWORD_HASH, "")
+    }
+
     fun logout() {
         val editor = prefs.edit()
         editor.remove(KEY_IS_LOGGED_IN)
         editor.remove(KEY_USER_NAME)
         editor.remove(KEY_USER_EMAIL)
+        editor.remove(KEY_USER_UID)
+        editor.remove(KEY_PASSWORD_HASH)
         editor.apply()
     }
 }

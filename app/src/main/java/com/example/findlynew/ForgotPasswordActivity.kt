@@ -95,10 +95,10 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     ).show()
                 } else {
                     progressDialog.setMessage("Memperbarui password...")
-                    FirebaseManager.updatePassword(email, password) { success ->
+                    FirebaseManager.updatePassword(email, password) { hash ->
                         runOnUiThread {
                             progressDialog.dismiss()
-                            if (success) {
+                            if (hash != null) {
                                 Toast.makeText(
                                     this@ForgotPasswordActivity,
                                     "Password berhasil diperbarui!",

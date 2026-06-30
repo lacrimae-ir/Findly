@@ -85,6 +85,7 @@ class LoginActivity : AppCompatActivity() {
                     progressDialog.dismiss()
                     if (user != null) {
                         sessionManager.saveLoginSession(user.username, user.email, user.uid)
+                        sessionManager.savePasswordHash(user.password)
                         if (user.profilePic.isNotEmpty()) {
                             sessionManager.saveProfilePic(user.email, user.profilePic)
                         }
